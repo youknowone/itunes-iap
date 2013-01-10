@@ -13,8 +13,12 @@ VERSION = (0, 0, 1)
 __version__ = '.'.join(map(str, VERSION))
 
 import json
+import pkg_resources
 import requests
 from itunesiap import exceptions
+
+__version__ = pkg_resources.resource_string('itunesiap', 'version.txt').strip()
+VERSION = tuple(int(v) for v in __version__.split('.'))
 
 RECEIPT_PRODUCTION_VALIDATION_URL = "https://buy.itunes.apple.com/verifyReceipt"
 RECEIPT_SANDBOX_VALIDATION_URL = "https://sandbox.itunes.apple.com/verifyReceipt"

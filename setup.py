@@ -6,6 +6,11 @@ except ImportError:
     from distutils.core import setup
 
 
+def get_version():
+    with open('itunesiap/version.txt') as f:
+        return f.read().strip()
+
+
 def get_readme():
     try:
         with open('README.md') as f:
@@ -16,7 +21,7 @@ def get_readme():
 
 setup(
     name='itunes-iap',
-    version=__import__('itunesiap').__version__,
+    version=get_version(),
     description='Itunes In-app purchase validation api.',
     long_description=get_readme(),
     author='Jeong YunWon',
@@ -25,7 +30,10 @@ setup(
     packages=(
         'itunesiap',
     ),
+    package_data={
+        'itunesiap': ['version.txt']
+    },
     install_requires=[
-        'requests',
+        'distribute', 'requests',
     ],
 )
