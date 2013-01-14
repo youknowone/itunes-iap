@@ -13,7 +13,7 @@ def get_version():
 
 def get_readme():
     try:
-        with open('README.md') as f:
+        with open('README.rst') as f:
             return f.read().strip()
     except IOError:
         return ''
@@ -34,6 +34,6 @@ setup(
         'itunesiap': ['version.txt']
     },
     install_requires=[
-        'distribute', 'requests',
+        'distribute', 'requests', 'prettyexc',
     ],
 )

@@ -1,8 +1,10 @@
 
-class ModeNotAvailable(Exception):
+from prettyexc import PrettyException
+
+class ModeNotAvailable(PrettyException):
     pass
 
-class RequestError(Exception):
+class RequestError(PrettyException):
     pass
 
 class ItunesServerNotAvailable(RequestError):

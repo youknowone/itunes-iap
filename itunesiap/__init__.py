@@ -64,14 +64,21 @@ class Request(object):
         self.response = None
         self.result = None
 
+    def __repr__(self):
+        valid = None
+        if self.result:
+            valid = self.result['status'] == 0
+        return u'<Request(valid:{0}, data:{1}...)>'.format(valid, self.receipt[:20])
+
     def validate_from(self, url):
         """Try validation from given url."""
         self.response = requests.post(url, json.dumps({'receipt-data': self.receipt}), verify=False)
         if self.response.status_code != 200:
-            raise exceptions.ItunesServerNotAvailable()
+            raise exceptions.ItunesServerNotAvailable(self.response.status_code, self.response.text)
         self.result = json.loads(self.response.text)
-        if self.result['status'] == 21007:
-            raise exceptions.InvalidReceipt()
+        status = self.result['status']
+        if status != 0:
+            raise exceptions.InvalidReceipt(status)
         return self.result
     
     def validate(self):
@@ -82,12 +89,12 @@ class Request(object):
         if self.use_production:
             try:
                 receipt = self.validate_from(RECEIPT_PRODUCTION_VALIDATION_URL)
-            except exceptions.InvalidReceipt:
+            except exceptions.InvalidReceipt, e:
                 pass
         if not receipt and self.use_sandbox:
             receipt = self.validate_from(RECEIPT_SANDBOX_VALIDATION_URL)
         if not receipt:
-            raise exceptions.ItunesServerNotAvailable
+            raise e
         return Receipt(receipt)
 
 
@@ -98,6 +105,9 @@ class Receipt(object):
         self.data = data
         self.receipt = data['receipt']
         self.receipt_keys = self.receipt.keys()
+
+    def __repr__(self):
+        return u'<Receipt({0}, {1})>'.format(self.status, self.receipt)
 
     @property
     def status(self):
