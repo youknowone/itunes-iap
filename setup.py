@@ -34,6 +34,6 @@ setup(
         'itunesiap': ['version.txt']
     },
     install_requires=[
-        'distribute', 'requests', 'prettyexc',
+        'distribute', 'requests', 'prettyexc>=0.4.1',
     ],
 )

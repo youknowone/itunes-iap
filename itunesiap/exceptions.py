@@ -11,4 +11,4 @@ class ItunesServerNotAvailable(RequestError):
     pass
 
 class InvalidReceipt(RequestError):
-    pass
+    _req_kwargs_keys = ['status']
