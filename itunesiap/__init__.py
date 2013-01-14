@@ -3,7 +3,7 @@
     itunes-iap
     ~~~~~~~~~~
 
-    Itunes In-app Purchase validation api.
+    Itunes In-app Purchase verification api.
 
     :copyright: (c) 2013 Jeong YunWon
     :license: 2-clause BSD.
@@ -26,8 +26,8 @@ RECEIPT_SANDBOX_VALIDATION_URL = "https://sandbox.itunes.apple.com/verifyReceipt
 USE_PRODUCTION = True
 USE_SANDBOX = False
 
-def set_validation_mode(mode):
-    """Set global validation mode that where allows production or sandbox.
+def set_verification_mode(mode):
+    """Set global verification mode that where allows production or sandbox.
     `production`, `sandbox`, `review` or `reject` availble. Or raise
     an exception.
 
@@ -55,7 +55,7 @@ def set_validation_mode(mode):
 
 class Request(object):
     """Validation request with raw receipt. Receipt must be base64 encoded string.
-    Use `validate` method to try validation and get Receipt or exception.
+    Use `verify` method to try verification and get Receipt or exception.
     """
     def __init__(self, receipt, **kwargs):
         self.receipt = receipt
@@ -70,8 +70,8 @@ class Request(object):
             valid = self.result['status'] == 0
         return u'<Request(valid:{0}, data:{1}...)>'.format(valid, self.receipt[:20])
 
-    def validate_from(self, url):
-        """Try validation from given url."""
+    def verify_from(self, url):
+        """Try verification from given url."""
         self.response = requests.post(url, json.dumps({'receipt-data': self.receipt}), verify=False)
         if self.response.status_code != 200:
             raise exceptions.ItunesServerNotAvailable(self.response.status_code, self.response.text)
@@ -80,19 +80,22 @@ class Request(object):
         if status != 0:
             raise exceptions.InvalidReceipt(status)
         return self.result
-    
+   
     def validate(self):
-        """Try validation with settings. Returns a Receipt object if successed.
+        return self.verify()
+
+    def verify(self):
+        """Try verification with settings. Returns a Receipt object if successed.
         Or raise an exception. See `self.response` or `self.result` to see details.
         """
         receipt = None
         if self.use_production:
             try:
-                receipt = self.validate_from(RECEIPT_PRODUCTION_VALIDATION_URL)
+                receipt = self.verify_from(RECEIPT_PRODUCTION_VALIDATION_URL)
             except exceptions.InvalidReceipt, e:
                 pass
         if not receipt and self.use_sandbox:
-            receipt = self.validate_from(RECEIPT_SANDBOX_VALIDATION_URL)
+            receipt = self.verify_from(RECEIPT_SANDBOX_VALIDATION_URL)
         if not receipt:
             raise e
         return Receipt(receipt)

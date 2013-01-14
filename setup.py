@@ -22,7 +22,7 @@ def get_readme():
 setup(
     name='itunes-iap',
     version=get_version(),
-    description='Itunes In-app purchase validation api.',
+    description='Itunes In-app purchase verification api.',
     long_description=get_readme(),
     author='Jeong YunWon',
     author_email='itunesiap@youknowone.org',

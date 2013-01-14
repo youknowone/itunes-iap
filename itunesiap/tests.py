@@ -2,20 +2,20 @@
 """
 https://developer.apple.com/library/ios/#documentation/NetworkingInternet/Conceptual/StoreKitGuide/VerifyingStoreReceipts/VerifyingStoreReceipts.html#//apple_ref/doc/uid/TP40008267-CH104-SW1
 """
-from itunesiap import Request, Receipt, set_validation_mode
+from itunesiap import Request, Receipt, set_verification_mode
 from itunesiap import exceptions
 
 def test_mode():
-    set_validation_mode('production')
+    set_verification_mode('production')
     assert Request('').use_production == True 
     assert Request('').use_sandbox == False 
-    set_validation_mode('sandbox')
+    set_verification_mode('sandbox')
     assert Request('').use_production == False 
     assert Request('').use_sandbox == True
-    set_validation_mode('reject')
+    set_verification_mode('reject')
     assert Request('').use_production == False 
     assert Request('').use_sandbox == False 
-    set_validation_mode('review')
+    set_verification_mode('review')
     assert Request('').use_production == True 
     assert Request('').use_sandbox == True
 
@@ -26,14 +26,14 @@ def test_request():
         print 'No receipt data to test'
         return
 
-    set_validation_mode('production')
+    set_verification_mode('production')
     request = Request(sandbox_receipt)
     try:
         receipt = request.validate()
         assert False
     except exceptions.InvalidReceipt, e:
         assert e.status == 21007    
-    set_validation_mode('review')
+    set_verification_mode('review')
     request = Request(sandbox_receipt)
     receipt = request.validate()
     assert receipt
