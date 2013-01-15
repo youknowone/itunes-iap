@@ -32,7 +32,8 @@ def test_request():
         receipt = request.validate()
         assert False
     except exceptions.InvalidReceipt, e:
-        assert e.status == 21007    
+        assert e.status == 21007
+        assert e.description == e._descriptions[21007]
     set_verification_mode('review')
     request = Request(sandbox_receipt)
     receipt = request.validate()
