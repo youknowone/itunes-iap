@@ -1,6 +1,7 @@
 
 import json
 import requests
+import contextlib
 from . import exceptions
 
 RECEIPT_PRODUCTION_VALIDATION_URL = "https://buy.itunes.apple.com/verifyReceipt"
@@ -8,6 +9,13 @@ RECEIPT_SANDBOX_VALIDATION_URL = "https://sandbox.itunes.apple.com/verifyReceipt
 
 USE_PRODUCTION = True
 USE_SANDBOX = False
+
+def config_from_mode(mode):
+    if mode not in ('production', 'sandbox', 'review', 'reject'):
+        raise exceptions.ModeNotAvailable(mode)
+    production = mode in ('production', 'review')
+    sandbox = mode in ('sandbox', 'review')
+    return production, sandbox
 
 def set_verification_mode(mode):
     """Set global verification mode that where allows production or sandbox.
@@ -20,20 +28,7 @@ def set_verification_mode(mode):
     `reject`: Reject all receipts.
     """
     global USE_PRODUCTION, USE_SANDBOX
-    if mode == 'production':
-        USE_PRODUCTION = True
-        USE_SANDBOX = False
-    elif mode == 'sandbox':
-        USE_PRODUCTION = False
-        USE_SANDBOX = True
-    elif mode == 'review':
-        USE_PRODUCTION = True
-        USE_SANDBOX = True
-    elif mode == 'reject':
-        USE_PRODUCTION = False
-        USE_SANDBOX = False
-    else:
-        raise exceptions.ModeNotAvailable(mode)
+    USE_PRODUCTION, USE_SANDBOX = config_from_mode(mode)
 
 
 class Request(object):
@@ -82,6 +77,13 @@ class Request(object):
         if not receipt:
             raise e
         return Receipt(receipt)
+
+    @contextlib.contextmanager
+    def verification_mode(self, mode):
+        configs = self.use_production, self.use_sandbox
+        self.use_production, self.use_sandbox = config_from_mode(mode)        
+        yield
+        self.use_production, self.use_sandbox = configs
 
 
 class Receipt(object):
