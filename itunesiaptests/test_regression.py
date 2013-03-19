@@ -73,9 +73,3 @@ def test_receipt():
     assert receipt.quantity == u'1' # check quantity
     assert receipt.unique_identifier == u'bcbdb3d45543920dd9sd5c79a72948001fc22a39'
 
-if __name__ == '__main__':
-    symbols = globals().keys()
-    for k in symbols:
-        if k.startswith('test_'):
-            globals()[k]()
-

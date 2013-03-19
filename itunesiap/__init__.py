@@ -15,3 +15,4 @@ __version__ = pkg_resources.resource_string('itunesiap', 'version.txt').strip()
 VERSION = tuple(int(v) for v in __version__.split('.'))
 
 from .core import Request, Receipt, set_verification_mode
+from .exceptions import ModeNotAvailable, RequestError
