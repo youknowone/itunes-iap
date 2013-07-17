@@ -52,13 +52,13 @@ class Request(object):
         """Try verification from given url."""
         self.response = requests.post(url, json.dumps({'receipt-data': self.receipt}), verify=False)
         if self.response.status_code != 200:
-            raise exceptions.ItunesServerNotAvailable(self.response.status_code, self.response.text)
-        self.result = json.loads(self.response.text)
+            raise exceptions.ItunesServerNotAvailable(self.response.status_code, self.response.content)
+        self.result = json.loads(self.response.content)
         status = self.result['status']
         if status != 0:
             raise exceptions.InvalidReceipt(status)
         return self.result
-   
+
     def validate(self):
         return self.verify()
 
@@ -81,7 +81,7 @@ class Request(object):
     @contextlib.contextmanager
     def verification_mode(self, mode):
         configs = self.use_production, self.use_sandbox
-        self.use_production, self.use_sandbox = config_from_mode(mode)        
+        self.use_production, self.use_sandbox = config_from_mode(mode)
         yield
         self.use_production, self.use_sandbox = configs
 
@@ -107,4 +107,4 @@ class Receipt(object):
         try:
             return super(Receipt, self).__getattr__(key)
         except AttributeError:
-            return super(Receipt, self).__getattribute__(key) 
+            return super(Receipt, self).__getattribute__(key)
