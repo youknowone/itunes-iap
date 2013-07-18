@@ -5,7 +5,7 @@ Quick example
 -------------
 
 Create request to create a request to itunes verify api.
-    
+
     >>> from itunesiap import Request
     >>> request = Request(raw_data) # base64-encoded data
     >>> receipt = request.verify()
