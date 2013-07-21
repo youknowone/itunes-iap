@@ -6,6 +6,7 @@
 
 from itunesiap import Request, Receipt, set_verification_mode
 from itunesiap import exceptions
+from six import u
 
 def test_mode():
     set_verification_mode('production')
@@ -26,7 +27,7 @@ def test_request():
     try:
         from testdata import sandbox_receipt
     except ImportError:
-        print 'No receipt data to test'
+        print('No receipt data to test')
         return
 
     set_verification_mode('production')
@@ -34,7 +35,7 @@ def test_request():
     try:
         receipt = request.validate()
         assert False
-    except exceptions.InvalidReceipt, e:
+    except exceptions.InvalidReceipt as e:
         assert e.status == 21007
         assert e.description == e._descriptions[21007]
     set_verification_mode('review')
@@ -46,7 +47,7 @@ def test_context():
     try:
         from testdata import sandbox_receipt
     except ImportError:
-        print 'No receipt data to test'
+        print('No receipt data to test')
         return
     request = Request(sandbox_receipt)
     configs = request.use_production, request.use_sandbox
@@ -54,14 +55,14 @@ def test_context():
         try:
             request.verify()
             assert False
-        except exceptions.InvalidReceipt, e:
+        except exceptions.InvalidReceipt as e:
             assert e.status == 21007
         with request.verification_mode('sandbox'):
             request.verify()
         try:
             request.verify()
             assert False
-        except exceptions.InvalidReceipt, e:
+        except exceptions.InvalidReceipt as e:
             assert e.status == 21007
     assert configs == (request.use_production, request.use_sandbox)
 
