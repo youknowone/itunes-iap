@@ -2,7 +2,9 @@
 import json
 import requests
 import contextlib
+from six import u
 from . import exceptions
+
 
 RECEIPT_PRODUCTION_VALIDATION_URL = "https://buy.itunes.apple.com/verifyReceipt"
 RECEIPT_SANDBOX_VALIDATION_URL = "https://sandbox.itunes.apple.com/verifyReceipt"
@@ -70,7 +72,7 @@ class Request(object):
         if self.use_production:
             try:
                 receipt = self.verify_from(RECEIPT_PRODUCTION_VALIDATION_URL)
-            except exceptions.InvalidReceipt, e:
+            except exceptions.InvalidReceipt as e:
                 pass
         if not receipt and self.use_sandbox:
             receipt = self.verify_from(RECEIPT_SANDBOX_VALIDATION_URL)
@@ -92,7 +94,7 @@ class Receipt(object):
     def __init__(self, data):
         self.data = data
         self.receipt = data['receipt']
-        self.receipt_keys = self.receipt.keys()
+        self.receipt_keys = list(self.receipt.keys())
 
     def __repr__(self):
         return u'<Receipt({0}, {1})>'.format(self.status, self.receipt)

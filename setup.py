@@ -1,4 +1,7 @@
-from __future__ import with_statement
+from six import PY3
+
+if not PY3:
+    from __future__ import with_statement
 
 try:
     from setuptools import setup
@@ -34,6 +37,6 @@ setup(
         'itunesiap': ['version.txt']
     },
     install_requires=[
-        'distribute', 'requests', 'prettyexc>=0.4.1',
+        'distribute', 'requests', 'prettyexc>=0.4.1', 'six'
     ],
 )
