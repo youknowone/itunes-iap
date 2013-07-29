@@ -34,7 +34,7 @@ setup(
         'itunesiap': ['version.txt']
     },
     install_requires=[
-        'distribute', 'requests', 'prettyexc>=0.5', 'six'
+        'requests', 'prettyexc>=0.5.1', 'six'
     ],
     classifiers=[
         'Intended Audience :: Developers',
