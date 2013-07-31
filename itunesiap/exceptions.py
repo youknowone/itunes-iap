@@ -1,10 +1,10 @@
 
-from prettyexc import PrettyException
+from prettyexc import PrettyException as E
 
-class ModeNotAvailable(PrettyException):
-    pass
+class ModeNotAvailable(E):
+    message = '`mode` should be one of `production`, `sandbox`, `review`, `reject`'
 
-class RequestError(PrettyException):
+class RequestError(E):
     pass
 
 class ItunesServerNotAvailable(RequestError):
@@ -28,3 +28,4 @@ class InvalidReceipt(RequestError):
         if self.status in self._descriptions:
             return self._descriptions[self.status]
         return None
+

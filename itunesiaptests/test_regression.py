@@ -6,9 +6,10 @@
 
 from itunesiap import Request, Receipt, set_verification_mode
 from itunesiap import exceptions
+from itunesiap import verify
 from six import u
 
-def test_mode():
+def test_global_mode():
     set_verification_mode('production')
     assert Request('').use_production == True
     assert Request('').use_sandbox == False
@@ -76,3 +77,6 @@ def test_receipt():
     assert receipt.quantity == u'1' # check quantity
     assert receipt.unique_identifier == u'bcbdb3d45543920dd9sd5c79a72948001fc22a39'
 
+def test_shortcut():
+    from testdata import sandbox_receipt
+    verify(sandbox_receipt)

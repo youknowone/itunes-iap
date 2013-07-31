@@ -110,3 +110,4 @@ class Receipt(object):
             return super(Receipt, self).__getattr__(key)
         except AttributeError:
             return super(Receipt, self).__getattribute__(key)
+
