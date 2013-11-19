@@ -1,4 +1,3 @@
-
 """
     itunes-iap
     ~~~~~~~~~~
@@ -18,6 +17,6 @@ if PY3:
 VERSION = tuple(int(v) for v in __version__.split('.'))
 
 from .core import Request, Receipt, set_verification_mode
-from .exceptions import ModeNotAvailable, RequestError
+from .exceptions import InvalidReceipt, ModeNotAvailable, RequestError
 from .shortcut import verify
 
