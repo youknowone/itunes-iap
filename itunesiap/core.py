@@ -75,9 +75,12 @@ class Request(object):
             except exceptions.InvalidReceipt as e:
                 pass
         if not receipt and self.use_sandbox:
-            receipt = self.verify_from(RECEIPT_SANDBOX_VALIDATION_URL)
+            try:
+                receipt = self.verify_from(RECEIPT_SANDBOX_VALIDATION_URL)
+            except exceptions.InvalidReceipt as ee:
+                pass
         if not receipt:
-            raise e
+            raise e # raise original error
         return Receipt(receipt)
 
     @contextlib.contextmanager
