@@ -55,11 +55,20 @@ class Request(object):
         self.response = requests.post(url, json.dumps({'receipt-data': self.receipt}), verify=False)
         if self.response.status_code != 200:
             raise exceptions.ItunesServerNotAvailable(self.response.status_code, self.response.content)
-        self.result = json.loads(self.response.content)
+        self.result = self._extract_receipt(json.loads(self.response.content))
         status = self.result['status']
         if status != 0:
             raise exceptions.InvalidReceipt(status)
         return self.result
+
+    def _extract_receipt(self, receipt_data):
+        """There are two formats that itunes iap purchase receipts are
+        sent back in
+        """
+        in_app_purchase = receipt_data.get('in_app', [])
+        if len(in_app_purchase) > 0:
+            receipt_data.update(in_app_purchase[0])
+        return receipt_data
 
     def validate(self):
         return self.verify()
