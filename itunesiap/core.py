@@ -55,6 +55,7 @@ class Request(object):
         """Try verification from given url."""
         #If the password exists from kwargs, pass it up with the request, otherwise leave it alone
         if len(self.password) > 1:
+            print json.dumps({'receipt-data': self.receipt, 'password': self.password})
             self.response = requests.post(url, json.dumps({'receipt-data': self.receipt, 'password': self.password}), verify=False)
         else:
             self.response = requests.post(url, json.dumps({'receipt-data': self.receipt}), verify=False)
