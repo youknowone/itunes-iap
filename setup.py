@@ -21,9 +21,9 @@ setup(
     version=get_version(),
     description='Itunes In-app purchase verification api.',
     long_description=get_readme(),
-    author='Jeong YunWon',
-    author_email='itunesiap@youknowone.org',
-    url='https://github.com/youknowone/itunes-iap',
+    author='Andy Briggs',
+    author_email='andy@sportsy.com',
+    url='https://github.com/sportsy/itunes-iap',
     packages=(
         'itunesiap',
     ),
