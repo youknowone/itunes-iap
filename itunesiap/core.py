@@ -118,6 +118,10 @@ class Receipt(object):
     def status(self):
         return self.data['status']
 
+    @property
+    def latest_receipt(self):
+        return self.data['latest_receipt']
+
     def __getattr__(self, key):
         if key in self.receipt_keys:
             return self.receipt[key]
