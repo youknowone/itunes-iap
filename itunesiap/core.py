@@ -37,9 +37,9 @@ class Request(object):
     """Validation request with raw receipt. Receipt must be base64 encoded string.
     Use `verify` method to try verification and get Receipt or exception.
     """
-    def __init__(self, receipt, **kwargs):
+    def __init__(self, receipt, password='', **kwargs):
         self.receipt = receipt
-        self.password = kwargs.get('password', '')
+        self.password = password
         self.use_production = kwargs.get('use_production', USE_PRODUCTION)
         self.use_sandbox = kwargs.get('use_sandbox', USE_SANDBOX)
         self.response = None
@@ -54,6 +54,7 @@ class Request(object):
     def verify_from(self, url):
         """Try verification from given url."""
         #If the password exists from kwargs, pass it up with the request, otherwise leave it alone
+        print json.dumps({'receipt-data': self.receipt, 'password': self.password})
         if len(self.password) > 1:
             print json.dumps({'receipt-data': self.receipt, 'password': self.password})
             self.response = requests.post(url, json.dumps({'receipt-data': self.receipt, 'password': self.password}), verify=False)
