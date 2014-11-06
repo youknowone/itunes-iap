@@ -4,7 +4,7 @@
 
     Itunes In-app Purchase verification api.
 
-    :copyright: (c) 2013 Jeong YunWon
+    :copyright: (c) 2013 Jeong YunWon - 2014 Andy Briggs
     :license: 2-clause BSD.
 """
 

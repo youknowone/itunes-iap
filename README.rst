@@ -16,6 +16,20 @@ Create request to create a request to itunes verify api.
 
 Practical useful values are: product_id, original_transaction_id, quantity, unique_identifier
 
+Quick example with password (Apple Shared Secret)
+-------------
+
+Create request to create a request to itunes verify api.
+
+    >>> from itunesiap import Request, InvalidReceipt
+    >>> request = Request(raw_data, password) # base64-encoded data
+    >>> try:
+    >>>     receipt = request.verify()
+    >>> except InvalidReceipt as e:
+    >>>     print 'invalid receipt'
+    >>> print receipt.product_id # any other values are available as property!
+    >>> print receipt.latest_receipt # Get the latest receipt returned by Apple
+
 
 Verification policy
 -------------------
