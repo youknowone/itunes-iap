@@ -56,3 +56,5 @@ Workflow Shortcut
     >>>     pass
     >>> # response is instance of `itunesiap.core.Response`
 
+
+.. _Forked from https://github.com/youknowone/itunes-iap
