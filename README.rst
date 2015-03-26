@@ -57,4 +57,4 @@ Workflow Shortcut
     >>> # response is instance of `itunesiap.core.Response`
 
 
-Forked from https://github.com/youknowone/itunes-iap
+Password support is merged from https://github.com/sportsy/itunes-iap
