@@ -93,9 +93,10 @@ class Request(object):
             try:
                 receipt = self.verify_from(RECEIPT_SANDBOX_VALIDATION_URL)
             except exceptions.InvalidReceipt as ee:
-                pass
+                if not self.use_production:
+                    e = ee
         if not receipt:
-            raise e # raise original error
+            raise e  # raise original error
         return Receipt(receipt)
 
     @contextlib.contextmanager
