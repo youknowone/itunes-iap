@@ -37,8 +37,9 @@ Verification policy
 Set verification mode for production or sandbox api. Review mode also available for appstore review.
 
     >>> from itunesiap import Request
+    >>> request = Request(raw_data)
     >>> with request.verification_mode('review'): # enable both production and sandbox for appstore review. 'production', 'sandbox' or 'review'
-    >>>     receipt = Request(raw_data).verify()
+    >>>     receipt = request.verify()
 
 Workflow Shortcut
 -----------------
