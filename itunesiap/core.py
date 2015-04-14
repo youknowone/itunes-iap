@@ -64,7 +64,7 @@ class Request(object):
         self.result = self._extract_receipt(json.loads(self.response.content))
         status = self.result['status']
         if status != 0:
-            raise exceptions.InvalidReceipt(status)
+            raise exceptions.InvalidReceipt(status, receipt=self.result.get('receipt', None))
         return self.result
 
     def _extract_receipt(self, receipt_data):
