@@ -12,12 +12,14 @@ RECEIPT_SANDBOX_VALIDATION_URL = "https://sandbox.itunes.apple.com/verifyReceipt
 USE_PRODUCTION = True
 USE_SANDBOX = False
 
+
 def config_from_mode(mode):
     if mode not in ('production', 'sandbox', 'review', 'reject'):
         raise exceptions.ModeNotAvailable(mode)
     production = mode in ('production', 'review')
     sandbox = mode in ('sandbox', 'review')
     return production, sandbox
+
 
 def set_verification_mode(mode):
     """Set global verification mode that where allows production or sandbox.
@@ -31,6 +33,16 @@ def set_verification_mode(mode):
     """
     global USE_PRODUCTION, USE_SANDBOX
     USE_PRODUCTION, USE_SANDBOX = config_from_mode(mode)
+
+
+def get_verification_mode():
+    if USE_PRODUCTION and USE_SANDBOX:
+        return 'review'
+    if USE_PRODUCTION:
+        return 'production'
+    if USE_SANDBOX:
+        return 'sandbox'
+    return 'reject'
 
 
 class Request(object):
@@ -53,7 +65,7 @@ class Request(object):
 
     def verify_from(self, url):
         """Try verification from given url."""
-        #If the password exists from kwargs, pass it up with the request, otherwise leave it alone
+        # If the password exists from kwargs, pass it up with the request, otherwise leave it alone
         if len(self.password) > 1:
             self.response = requests.post(url, json.dumps({'receipt-data': self.receipt, 'password': self.password}), verify=False)
         else:
@@ -70,6 +82,8 @@ class Request(object):
         """There are two formats that itunes iap purchase receipts are
         sent back in
         """
+        if 'receipt' not in receipt_data:
+            return receipt_data
         in_app_purchase = receipt_data['receipt'].get('in_app', [])
         if len(in_app_purchase) > 0:
             receipt_data['receipt'].update(in_app_purchase[0])
@@ -83,6 +97,7 @@ class Request(object):
         Or raise an exception. See `self.response` or `self.result` to see details.
         """
         receipt = None
+        assert (self.use_production or self.use_sandbox)
         if self.use_production:
             try:
                 receipt = self.verify_from(RECEIPT_PRODUCTION_VALIDATION_URL)
@@ -132,4 +147,3 @@ class Receipt(object):
             return super(Receipt, self).__getattr__(key)
         except AttributeError:
             return super(Receipt, self).__getattribute__(key)
-

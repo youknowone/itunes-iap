@@ -1,14 +1,18 @@
 
 from prettyexc import PrettyException as E
 
+
 class ModeNotAvailable(E):
     message = '`mode` should be one of `production`, `sandbox`, `review`, `reject`'
+
 
 class RequestError(E):
     pass
 
+
 class ItunesServerNotAvailable(RequestError):
     pass
+
 
 class InvalidReceipt(RequestError):
     _req_kwargs_keys = ['status']
@@ -28,4 +32,3 @@ class InvalidReceipt(RequestError):
         if self.status in self._descriptions:
             return self._descriptions[self.status]
         return None
-

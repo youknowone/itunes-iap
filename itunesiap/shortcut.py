@@ -2,6 +2,7 @@
 from . import core
 from . import exceptions
 
+
 def verify(data, test_paid=lambda id: id):
     """Convinient verification shortcut.
 

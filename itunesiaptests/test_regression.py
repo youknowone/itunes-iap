@@ -9,9 +9,9 @@ import requests
 from six import u
 import unittest
 
+import itunesiap
 from itunesiap import Request, Receipt, set_verification_mode
 from itunesiap import exceptions
-from itunesiap import verify
 
 
 class TestsIAP(unittest.TestCase):
@@ -39,17 +39,17 @@ class TestsIAP(unittest.TestCase):
 
     def test_global_mode(self):
         set_verification_mode('production')
-        assert Request('').use_production == True
-        assert Request('').use_sandbox == False
+        assert Request('').use_production is True
+        assert Request('').use_sandbox is False
         set_verification_mode('sandbox')
-        assert Request('').use_production == False
-        assert Request('').use_sandbox == True
+        assert Request('').use_production is False
+        assert Request('').use_sandbox is True
         set_verification_mode('reject')
-        assert Request('').use_production == False
-        assert Request('').use_sandbox == False
+        assert Request('').use_production is False
+        assert Request('').use_sandbox is False
         set_verification_mode('review')
-        assert Request('').use_production == True
-        assert Request('').use_sandbox == True
+        assert Request('').use_production is True
+        assert Request('').use_sandbox is True
 
     def test_request(self):
         try:
@@ -124,10 +124,10 @@ class TestsIAP(unittest.TestCase):
     def test_receipt(self):
         receipt = Receipt({u'status': 0, u'receipt': {u'purchase_date_pst': u'2013-01-01 00:00:00 America/Los_Angeles', u'product_id': u'TestProduction1', u'original_transaction_id': u'1000000012345678', u'unique_identifier': u'bcbdb3d45543920dd9sd5c79a72948001fc22a39', u'original_purchase_date_pst': u'2013-01-01 00:00:00 America/Los_Angeles', u'original_purchase_date': u'2013-01-01 00:00:00 Etc/GMT', u'bvrs': u'1.0', u'original_purchase_date_ms': u'1348200000000', u'purchase_date': u'2013-01-01 00:00:00 Etc/GMT', u'item_id': u'500000000', u'purchase_date_ms': u'134820000000', u'bid': u'org.youknowone.itunesiap', u'transaction_id': u'1000000012345678', u'quantity': u'1'}})
 
-        assert receipt.status == 0 # 0 is normal
-        assert receipt.product_id == u'TestProduction1' #
-        assert receipt.original_transaction_id == u'1000000012345678' # original transaction id
-        assert receipt.quantity == u'1' # check quantity
+        assert receipt.status == 0  # 0 is normal
+        assert receipt.product_id == u'TestProduction1'  #
+        assert receipt.original_transaction_id == u'1000000012345678'  # original transaction id
+        assert receipt.quantity == u'1'  # check quantity
         assert receipt.unique_identifier == u'bcbdb3d45543920dd9sd5c79a72948001fc22a39'
 
     def test_shortcut(self):
@@ -136,7 +136,11 @@ class TestsIAP(unittest.TestCase):
         except ImportError:
             print('No receipt data to test')
             return
-        verify(sandbox_receipt)
+        mode = itunesiap.get_verification_mode()
+        itunesiap.set_verification_mode('sandbox')
+        itunesiap.verify(sandbox_receipt)
+        itunesiap.set_verification_mode(mode)
+
 
 if __name__ == '__main__':
     unittest.main()
