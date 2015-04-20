@@ -54,7 +54,6 @@ class Request(object):
     def verify_from(self, url):
         """Try verification from given url."""
         #If the password exists from kwargs, pass it up with the request, otherwise leave it alone
-        print json.dumps({'receipt-data': self.receipt, 'password': self.password})
         if len(self.password) > 1:
             self.response = requests.post(url, json.dumps({'receipt-data': self.receipt, 'password': self.password}), verify=False)
         else:
@@ -71,9 +70,9 @@ class Request(object):
         """There are two formats that itunes iap purchase receipts are
         sent back in
         """
-        in_app_purchase = receipt_data.get('in_app', [])
+        in_app_purchase = receipt_data['receipt'].get('in_app', [])
         if len(in_app_purchase) > 0:
-            receipt_data.update(in_app_purchase[0])
+            receipt_data['receipt'].update(in_app_purchase[0])
         return receipt_data
 
     def validate(self):
