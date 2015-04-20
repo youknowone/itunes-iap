@@ -71,9 +71,9 @@ class Request(object):
         """There are two formats that itunes iap purchase receipts are
         sent back in
         """
-        in_app_purchase = receipt_data.get('in_app', [])
+        in_app_purchase = receipt_data['receipt'].get('in_app', [])
         if len(in_app_purchase) > 0:
-            receipt_data.update(in_app_purchase[0])
+            receipt_data['receipt'].update(in_app_purchase[0])
         return receipt_data
 
     def validate(self):
