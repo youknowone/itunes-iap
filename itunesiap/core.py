@@ -86,7 +86,7 @@ class Request(object):
             return receipt_data
         in_app_purchase = receipt_data['receipt'].get('in_app', [])
         if len(in_app_purchase) > 0:
-            receipt_data['receipt'].update(in_app_purchase[0])
+            receipt_data['receipt'].update(in_app_purchase[-1])
         return receipt_data
 
     def validate(self):
