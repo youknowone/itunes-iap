@@ -19,22 +19,61 @@ class TestsIAP(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(TestsIAP, self).__init__(*args, **kwargs)
         self.iap_response = {
-            "receipt": {
-                "original_purchase_date_pst": "2010-04-30 08:05:55 America/Los_Angeles",
-                "original_transaction_id": "100000004817",
-                "original_purchase_date_ms": "133355868",
-                "transaction_id": "1000000046178817",
-                "quantity": "1",
-                "product_id": "com.Product",
-                "bvrs": "20120427",
-                "purchase_date_ms": "133355868",
-                "purchase_date": "2010-04-30 15:05:55 Etc/GMT",
-                "original_purchase_date": "2010-04-30 15:05:55 Etc/GMT",
-                "purchase_date_pst": "2010-04-30 08:05:55 America/Los_Angeles",
-                "bid": "com.Example",
-                "item_id": "521129812"
-            },
-            "status": 0
+            u'status': 0,
+            u'receipt': {
+                u'purchase_date_pst': u'2013-01-01 00:00:00 America/Los_Angeles',
+                u'product_id': u'TestProduction1',
+                u'original_transaction_id': u'1000000012345678',
+                u'unique_identifier': u'bcbdb3d45543920dd9sd5c79a72948001fc22a39',
+                u'original_purchase_date_pst': u'2013-01-01 00:00:00 America/Los_Angeles',
+                u'original_purchase_date': u'2013-01-01 00:00:00 Etc/GMT',
+                u'bvrs': u'1.0',
+                u'original_purchase_date_ms': u'1348200000000',
+                u'purchase_date': u'2013-01-01 00:00:00 Etc/GMT',
+                u'item_id': u'500000000',
+                u'purchase_date_ms': u'134820000000',
+                u'bid': u'org.youknowone.itunesiap',
+                u'transaction_id': u'1000000012345678',
+                u'quantity': u'1'
+            }
+        }
+
+        # Response with multiple in_app's
+        self.iap_response_in_app = {
+            u'status': 0,
+            u'receipt': {
+                u'original_purchase_date_pst': u'2013-01-01 00:00:00 America/Los_Angeles',
+                u'version_external_identifier': 0,
+                u'original_purchase_date': u'2013-01-01 07:00:00 Etc/GMT',
+                u'in_app': [
+                    {
+                        u'is_trial_period': u'false',
+                        u'purchase_date_pst': u'2013-05-18 20:21:09 America/Los_Angeles',
+                        u'product_id': u'org.itunesiap',
+                        u'original_transaction_id': u'1000000155715958',
+                        u'original_purchase_date_pst': u'2013-05-18 19:29:45 America/Los_Angeles',
+                        u'original_purchase_date': u'2013-05-19 02:29:45 Etc/GMT',
+                        u'original_purchase_date_ms': u'1432002585000',
+                        u'purchase_date': u'2013-05-19 03:21:09 Etc/GMT',
+                        u'purchase_date_ms': u'1432005669000',
+                        u'transaction_id': u'1000000155715958',
+                        u'quantity': u'1'
+                    },
+                    {
+                        u'is_trial_period': u'false',
+                        u'purchase_date_pst': u'2013-05-19 20:21:09 America/Los_Angeles',
+                        u'product_id': u'org.itunesiap',
+                        u'original_transaction_id': u'1000000155718067',
+                        u'original_purchase_date_pst': u'2013-05-18 19:37:10 America/Los_Angeles',
+                        u'original_purchase_date': u'2013-05-19 02:37:10 Etc/GMT',
+                        u'original_purchase_date_ms': u'1432003030000',
+                        u'purchase_date': u'2013-05-19 03:21:09 Etc/GMT',
+                        u'purchase_date_ms': u'1432005669000',
+                        u'transaction_id': u'1000000155718067',
+                        u'quantity': u'1'
+                    }
+                ]
+            }
         }
 
     def test_global_mode(self):
@@ -122,7 +161,7 @@ class TestsIAP(unittest.TestCase):
         assert configs == (request.use_production, request.use_sandbox)
 
     def test_receipt(self):
-        receipt = Receipt({u'status': 0, u'receipt': {u'purchase_date_pst': u'2013-01-01 00:00:00 America/Los_Angeles', u'product_id': u'TestProduction1', u'original_transaction_id': u'1000000012345678', u'unique_identifier': u'bcbdb3d45543920dd9sd5c79a72948001fc22a39', u'original_purchase_date_pst': u'2013-01-01 00:00:00 America/Los_Angeles', u'original_purchase_date': u'2013-01-01 00:00:00 Etc/GMT', u'bvrs': u'1.0', u'original_purchase_date_ms': u'1348200000000', u'purchase_date': u'2013-01-01 00:00:00 Etc/GMT', u'item_id': u'500000000', u'purchase_date_ms': u'134820000000', u'bid': u'org.youknowone.itunesiap', u'transaction_id': u'1000000012345678', u'quantity': u'1'}})
+        receipt = Receipt(self.iap_response)
 
         assert receipt.status == 0  # 0 is normal
         assert receipt.product_id == u'TestProduction1'  #
@@ -141,6 +180,30 @@ class TestsIAP(unittest.TestCase):
         itunesiap.verify(sandbox_receipt)
         itunesiap.set_verification_mode(mode)
 
+    def test_extract_receipt(self):
+        """
+            Testing the extract receipt function.
+            The function which helps to put the last 'in_app's fields' in the
+            'receipt dictionary'
+        """
+
+        # Test IAP Response without in_app list
+        request = Request('DummyReceipt', use_production=True)
+        ext_receipt = request._extract_receipt(self.iap_response)
+
+        assert ext_receipt['status'] == 0  # 0 is normal
+        assert ext_receipt['receipt']['product_id'] == u'TestProduction1'
+        assert ext_receipt['receipt']['original_transaction_id'] == u'1000000012345678'  # original transaction id
+        assert ext_receipt['receipt']['quantity'] == u'1'  # check quantity
+
+        # Test IAP Response with in_app list
+        request = Request('DummyReceipt', use_production=True)
+        ext_receipt = request._extract_receipt(self.iap_response_in_app)
+
+        assert ext_receipt['status'] == 0  # 0 is normal
+        assert ext_receipt['receipt']['product_id'] == u'org.itunesiap'
+        assert ext_receipt['receipt']['original_transaction_id'] == u'1000000155715958'  # original transaction id
+        assert ext_receipt['receipt']['quantity'] == u'1'  # check quantity
 
 if __name__ == '__main__':
     unittest.main()
