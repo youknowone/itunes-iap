@@ -72,7 +72,7 @@ class Request(object):
             self.response = requests.post(url, json.dumps({'receipt-data': self.receipt}), verify=False)
         if self.response.status_code != 200:
             raise exceptions.ItunesServerNotAvailable(self.response.status_code, self.response.content)
-        self.result = self._extract_receipt(json.loads(self.response.content))
+        self.result = self._extract_receipt(self.response.json())
         status = self.result['status']
         if status != 0:
             raise exceptions.InvalidReceipt(status, receipt=self.result.get('receipt', None))
@@ -96,21 +96,22 @@ class Request(object):
         """Try verification with settings. Returns a Receipt object if successed.
         Or raise an exception. See `self.response` or `self.result` to see details.
         """
+        ex = None
         receipt = None
         assert (self.use_production or self.use_sandbox)
         if self.use_production:
             try:
                 receipt = self.verify_from(RECEIPT_PRODUCTION_VALIDATION_URL)
             except exceptions.InvalidReceipt as e:
-                pass
+                ex = e
         if not receipt and self.use_sandbox:
             try:
                 receipt = self.verify_from(RECEIPT_SANDBOX_VALIDATION_URL)
-            except exceptions.InvalidReceipt as ee:
+            except exceptions.InvalidReceipt as e:
                 if not self.use_production:
-                    e = ee
+                    ex = e
         if not receipt:
-            raise e  # raise original error
+            raise ex  # raise original error
         return Receipt(receipt)
 
     @contextlib.contextmanager
