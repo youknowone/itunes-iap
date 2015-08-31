@@ -1,6 +1,9 @@
 itunes-iap
 ~~~~~~~~~~
 
+.. image:: https://travis-ci.org/silverlogic/itunes-iap.svg?branch=master
+    :target: https://travis-ci.org/silverlogic/itunes-iap
+
 Quick example
 -------------
 
