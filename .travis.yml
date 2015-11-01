@@ -1,0 +1,20 @@
+language: python
+python:
+  - "2.6"
+  - "2.7"
+  - "3.3"
+  - "3.4"
+  - "3.5"
+  - "pypy"
+  - "nightly"
+# command to install dependencies
+install:
+  - "pip install flake8 mock ."
+# command to run tests
+script:
+  - "flake8 --ignore=E501 ."
+  - "py.test"
+matrix:
+  allow_failures:
+    - python: nightly
+sudo: false

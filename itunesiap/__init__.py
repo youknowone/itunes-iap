@@ -1,11 +1,11 @@
 """
-    itunes-iap
-    ~~~~~~~~~~
+itunes-iap
+~~~~~~~~~~
 
-    Itunes In-app Purchase verification api.
+Itunes In-app Purchase verification api.
 
-    :copyright: (c) 2013 Jeong YunWon - 2014 Andy Briggs
-    :license: 2-clause BSD.
+:copyright: (c) 2013 Jeong YunWon - 2014 Andy Briggs
+:license: 2-clause BSD.
 """
 
 from six import PY3
@@ -16,7 +16,18 @@ if PY3:
     __version__ = __version__.decode('ascii')
 VERSION = tuple(int(v) for v in __version__.split('.'))
 
-from .core import Request, Receipt, set_verification_mode, get_verification_mode
-from .exceptions import InvalidReceipt, ModeNotAvailable, RequestError
+
+__all__ = (
+    'Request', 'Response', 'Receipt', 'InApp', 'verify',
+    'exceptions', 'exc', 'environment', 'env')
+
+
+from .request import Request
+from .receipt import Response, Receipt, InApp
 from .shortcut import verify
 
+from . import exceptions
+exc = exceptions
+
+from . import environment
+env = environment  # env.default, env.sandbox, env.review

@@ -6,12 +6,11 @@
 import json
 from mock import patch
 import requests
-from six import u
 import unittest
 
-import itunesiap
-from itunesiap import Request, Receipt, set_verification_mode
-from itunesiap import exceptions
+import itunesiap.legacy as itunesiap
+from itunesiap.legacy import Request, Receipt, set_verification_mode
+from itunesiap.legacy import exceptions
 
 
 class TestsIAP(unittest.TestCase):
@@ -100,14 +99,14 @@ class TestsIAP(unittest.TestCase):
         set_verification_mode('production')
         request = Request(sandbox_receipt)
         try:
-            receipt = request.validate()
+            receipt = request.verify()
             assert False
         except exceptions.InvalidReceipt as e:
             assert e.status == 21007
             assert e.description == e._descriptions[21007]
-        set_verification_mode('review')
+        set_verification_mode('sandbox')
         request = Request(sandbox_receipt)
-        receipt = request.validate()
+        receipt = request.verify()
         assert receipt
 
     def test_responses(self):
@@ -120,7 +119,7 @@ class TestsIAP(unittest.TestCase):
             set_verification_mode('production')
             request = Request('DummyReceipt')
             try:
-                receipt = request.validate()
+                request.verify()
             except exceptions.InvalidReceipt as e:
                 assert e.status == 21007
                 assert e.description == e._descriptions[21007]
@@ -132,10 +131,10 @@ class TestsIAP(unittest.TestCase):
             set_verification_mode('production')
             request = Request('DummyReceipt')
             try:
-                receipt = request.validate()
+                request.verify()
             except exceptions.ItunesServerNotAvailable as e:
-                assert e[0] == 500
-                assert e[1] == 'Not avaliable'
+                assert e.args[0] == 500
+                assert e.args[1] == 'Not avaliable'
 
     def test_context(self):
         try:
@@ -151,7 +150,7 @@ class TestsIAP(unittest.TestCase):
                 assert False
             except exceptions.InvalidReceipt as e:
                 assert e.status == 21007
-            with request.verification_mode('sandbox'):
+            with request.verification_mode('review'):
                 request.verify()
             try:
                 request.verify()
@@ -202,8 +201,9 @@ class TestsIAP(unittest.TestCase):
 
         assert ext_receipt['status'] == 0  # 0 is normal
         assert ext_receipt['receipt']['product_id'] == u'org.itunesiap'
-        assert ext_receipt['receipt']['original_transaction_id'] == u'1000000155715958'  # original transaction id
+        assert ext_receipt['receipt']['original_transaction_id'] == u'1000000155718067'  # original transaction id
         assert ext_receipt['receipt']['quantity'] == u'1'  # check quantity
+
 
 if __name__ == '__main__':
     unittest.main()

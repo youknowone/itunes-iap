@@ -2,10 +2,6 @@
 from prettyexc import PrettyException as E
 
 
-class ModeNotAvailable(E):
-    message = '`mode` should be one of `production`, `sandbox`, `review`, `reject`'
-
-
 class RequestError(E):
     pass
 

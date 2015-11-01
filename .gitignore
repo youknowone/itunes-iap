@@ -4,3 +4,9 @@ dist
 *.pyc
 *.egg-info
 MANIFEST
+
+.idea
+.tox
+.ropeproject
+/build
+setup.cfg

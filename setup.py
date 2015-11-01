@@ -19,7 +19,7 @@ def get_readme():
 setup(
     name='itunes-iap',
     version=get_version(),
-    description='Itunes In-app purchase verification api.',
+    description='Apple iTunes In-app purchase verification api.',
     long_description=get_readme(),
     author='Jeong YunWon',
     author_email='itunesiap@youknowone.org',
@@ -31,18 +31,19 @@ setup(
         'itunesiap': ['version.txt']
     },
     install_requires=[
-        'requests', 'prettyexc>=0.5.1', 'six'
+        'requests', 'prettyexc>=0.5.1', 'six',
     ],
     classifiers=[
         'Intended Audience :: Developers',
         'Operating System :: OS Independent',
+        'License :: OSI Approved :: BSD License',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.2',
         'Programming Language :: Python :: 3.3',
-     ],
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+    ],
 )
-

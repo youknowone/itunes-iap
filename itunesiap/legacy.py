@@ -1,16 +1,27 @@
 
-import json
-import requests
-import contextlib
-from six import u
 from . import exceptions
+from .tools import lazy_property, deprecated
+import requests
+import json
+import contextlib
 
 
 RECEIPT_PRODUCTION_VALIDATION_URL = "https://buy.itunes.apple.com/verifyReceipt"
 RECEIPT_SANDBOX_VALIDATION_URL = "https://sandbox.itunes.apple.com/verifyReceipt"
 
+
 USE_PRODUCTION = True
 USE_SANDBOX = False
+
+
+from prettyexc import PrettyException as E
+
+
+class ModeNotAvailable(E):
+    message = '`mode` should be one of `production`, `sandbox`, `review`, `reject`'
+
+
+exceptions.ModeNotAvailable = ModeNotAvailable
 
 
 def config_from_mode(mode):
@@ -23,7 +34,7 @@ def config_from_mode(mode):
 
 def set_verification_mode(mode):
     """Set global verification mode that where allows production or sandbox.
-    `production`, `sandbox`, `review` or `reject` availble. Or raise
+    `production`, `sandbox`, `review` or `reject` availble. Otherwise raise
     an exception.
 
     `production`: Allows production receipts only. Default.
@@ -47,15 +58,16 @@ def get_verification_mode():
 
 class Request(object):
     """Validation request with raw receipt. Receipt must be base64 encoded string.
+
     Use `verify` method to try verification and get Receipt or exception.
     """
-    def __init__(self, receipt, password='', **kwargs):
+
+    def __init__(self, receipt, password=None, **kwargs):
         self.receipt = receipt
         self.password = password
         self.use_production = kwargs.get('use_production', USE_PRODUCTION)
         self.use_sandbox = kwargs.get('use_sandbox', USE_SANDBOX)
         self.response = None
-        self.result = None
 
     def __repr__(self):
         valid = None
@@ -63,16 +75,21 @@ class Request(object):
             valid = self.result['status'] == 0
         return u'<Request(valid:{0}, data:{1}...)>'.format(valid, self.receipt[:20])
 
+    @lazy_property
+    def result(self):
+        return self._extract_receipt(json.loads(self.response.content))
+
     def verify_from(self, url):
         """Try verification from given url."""
         # If the password exists from kwargs, pass it up with the request, otherwise leave it alone
-        if len(self.password) > 1:
-            self.response = requests.post(url, json.dumps({'receipt-data': self.receipt, 'password': self.password}), verify=False)
+        if self.password is not None:
+            request_content = {'receipt-data': self.receipt, 'password': self.password}
         else:
-            self.response = requests.post(url, json.dumps({'receipt-data': self.receipt}), verify=False)
+            request_content = {'receipt-data': self.receipt}
+        self.response = requests.post(url, json.dumps(request_content), verify=False)
         if self.response.status_code != 200:
             raise exceptions.ItunesServerNotAvailable(self.response.status_code, self.response.content)
-        self.result = self._extract_receipt(json.loads(self.response.content))
+
         status = self.result['status']
         if status != 0:
             raise exceptions.InvalidReceipt(status, receipt=self.result.get('receipt', None))
@@ -89,6 +106,7 @@ class Request(object):
             receipt_data['receipt'].update(in_app_purchase[-1])
         return receipt_data
 
+    @deprecated
     def validate(self):
         return self.verify()
 
@@ -98,17 +116,20 @@ class Request(object):
         """
         receipt = None
         assert (self.use_production or self.use_sandbox)
+        e = None
         if self.use_production:
             try:
                 receipt = self.verify_from(RECEIPT_PRODUCTION_VALIDATION_URL)
-            except exceptions.InvalidReceipt as e:
-                pass
+            except exceptions.InvalidReceipt as ee:
+                e = ee
+
         if not receipt and self.use_sandbox:
             try:
                 receipt = self.verify_from(RECEIPT_SANDBOX_VALIDATION_URL)
             except exceptions.InvalidReceipt as ee:
                 if not self.use_production:
                     e = ee
+
         if not receipt:
             raise e  # raise original error
         return Receipt(receipt)
@@ -133,6 +154,10 @@ class Receipt(object):
         return u'<Receipt({0}, {1})>'.format(self.status, self.receipt)
 
     @property
+    def _(self):
+        return self.data
+
+    @property
     def status(self):
         return self.data['status']
 
@@ -147,3 +172,17 @@ class Receipt(object):
             return super(Receipt, self).__getattr__(key)
         except AttributeError:
             return super(Receipt, self).__getattribute__(key)
+
+
+def verify(data, test_paid=lambda id: id):
+    """Convinient verification shortcut.
+
+    :param data: Itunes receipt data
+    :param test_paid: Function to test the recept is paid. Function should
+        raise error to disallow response. Parameter is `original_transaction_id`
+    :return: :class:`itunesiap.core.Response`
+    """
+    request = Request(data)
+    response = request.verify()
+    test_paid(response.original_transaction_id)
+    return response
