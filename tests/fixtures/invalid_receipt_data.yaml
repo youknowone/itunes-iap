@@ -1,0 +1,43 @@
+interactions:
+- request:
+    body: !!binary |
+      eyJyZWNlaXB0LWRhdGEiOiAiaW52YWxpZCIsICJwYXNzd29yZCI6ICJmb29iYXIifT0=
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Length: ['49']
+      User-Agent: [python-requests/2.7.0 CPython/3.4.0 Linux/3.13.0-63-generic]
+    method: POST
+    uri: https://sandbox.itunes.apple.com/verifyReceipt
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAAKtWKi5JLCktVrIyMjQwMKoFAM6Ac/QQAAAA
+    headers:
+      Date: ['Tue, 08 Sep 2015 13:05:19 GMT']
+      apple-timing-app: [3 ms]
+      cache-control: [private, no-cache, no-store, no-transform, must-revalidate,
+        max-age=0]
+      connection: [keep-alive]
+      content-encoding: [gzip]
+      content-length: ['36']
+      edge-control: [no-store, cache-maxage=0]
+      expires: ['Tue, 08 Sep 2015 13:05:19 GMT']
+      itspod: ['100']
+      pod: ['100']
+      set-cookie: ['itspod=100; version="1"; expires=Thu, 08-Oct-2015 13:05:19 GMT;
+          path=/; domain=.apple.com', mzf_in=990138; version="1"; path=/WebObjects;
+          domain=.apple.com; secure; HttpOnly, 'mzf_dr=0; version="1"; expires=Thu,
+          01-Jan-1970 00:00:00 GMT; path=/WebObjects; domain=.apple.com']
+      strict-transport-security: [max-age=31536000]
+      x-apple-application-instance: ['990138']
+      x-apple-application-site: [SB]
+      x-apple-jingle-correlation-key: [M7HN2IVBZYNMQIIV64I4DJAZXM]
+      x-apple-lokamai-no-cache: ['true']
+      x-apple-orig-url: ['https://sandbox.itunes.apple.com/WebObjects/MZFinance.woa/wa/verifyReceipt']
+      x-apple-translated-wo-url: [/WebObjects/MZFinance.woa/wa/verifyReceipt]
+      x-frame-options: [SAMEORIGIN]
+      x-webobjects-loadaverage: ['0']
+    status: {code: 200, message: Apple WebObjects}
+version: 1
