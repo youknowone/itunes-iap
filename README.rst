@@ -1,8 +1,8 @@
 itunes-iap
 ~~~~~~~~~~
 
-.. image:: https://travis-ci.org/silverlogic/itunes-iap.svg?branch=master
-    :target: https://travis-ci.org/silverlogic/itunes-iap
+.. image:: https://travis-ci.org/youknowone/itunes-iap.svg?branch=master
+    :target: https://travis-ci.org/youknowone/itunes-iap
 
 Quick example
 -------------
@@ -20,7 +20,7 @@ Create request to create a request to itunes verify api.
 Practical useful values are: product_id, original_transaction_id, quantity, unique_identifier
 
 Quick example with password (Apple Shared Secret)
--------------
+-------------------------------------------------
 
 Create request to create a request to itunes verify api.
 
