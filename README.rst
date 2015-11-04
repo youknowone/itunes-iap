@@ -1,7 +1,7 @@
 itunes-iap
 ~~~~~~~~~~
 
-.. image:: https://travis-ci.org/youknowone/itunes-iap.svg?branch=master
+.. image:: https://travis-ci.org/youknowone/itunes-iap.svg?branch=v1
     :target: https://travis-ci.org/youknowone/itunes-iap
 
 Quick example
