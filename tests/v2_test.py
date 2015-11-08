@@ -181,6 +181,19 @@ def test_receipt():
 
     assert response.status == 0  # 0 is normal
 
+    # get the in_app property from the respnse
+    in_app = response.receipt.in_app
+    assert len(in_app) == 2
+
+    # test that the InApp object was setup correctly
+    in_app0 = in_app[0]
+    assert in_app0.product_id == u'org.itunesiap'
+    assert in_app0.original_transaction_id == u'1000000155715958'
+    assert in_app0.quantity == 1
+
+    # and that the last_in_app alias is set up correctly
+    assert response.receipt.last_in_app == in_app[-1]
+
 
 def test_shortcut():
     """Test shortcuts"""
