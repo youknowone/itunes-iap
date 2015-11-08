@@ -1,5 +1,7 @@
 
 import warnings
+import json
+
 from .tools import lazy_property
 
 
@@ -68,8 +70,18 @@ class Receipt(ObjectMapper):
         return self.in_app[-1]
 
 
+def json_bool_to_native(data):
+    assert data in ('true', 'false'), \
+        ("Cannot convert {0}, "
+         "acceptable values are true' and 'false'".format(data))
+    return json.loads(data)
+
+
 class InApp(ObjectMapper):
-    __WHITELIST__ = ['quantity', 'product_id', 'transaction_id', 'original_transaction_id', 'purchase_date', 'original_purchase_date', 'expires_date', 'cancellation_date']
+    __WHITELIST__ = ['quantity', 'product_id', 'transaction_id', 'original_transaction_id', 'purchase_date', 'original_purchase_date', 'expires_date', 'cancellation_date', 'is_trial_period', 'original_purchase_date_ms', 'purchase_date_ms']
     __EXPORT_FILTERS__ = {
         'quantity': int,
+        'is_trial_period': json_bool_to_native,
+        'original_purchase_date_ms': int,
+        'purchase_date_ms': int,
     }
