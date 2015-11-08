@@ -53,7 +53,7 @@ class Response(ObjectMapper):
 
 
 class Receipt(ObjectMapper):
-    __WHITELIST__ = []
+    __WHITELIST__ = ['in_app']
     __EXPORT_FILTERS__ = {}
 
     @lazy_property
