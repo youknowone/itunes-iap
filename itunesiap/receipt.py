@@ -72,7 +72,8 @@ class Receipt(ObjectMapper):
 
 def json_bool_to_native(data):
     assert data in ('true', 'false'), \
-        "Cannot convert {0}, acceptable values are 'true' and 'false'".format(data)
+            ("Cannot convert {0}, "
+            "acceptable values are true' and 'false'".format(data))
     return json.loads(data)
 
 
