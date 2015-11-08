@@ -77,7 +77,7 @@ def json_bool_to_native(data):
 
 
 class InApp(ObjectMapper):
-    __WHITELIST__ = ['quantity', 'product_id', 'transaction_id', 'original_transaction_id', 'purchase_date', 'original_purchase_date', 'expires_date', 'cancellation_date', 'is_trial_period', u'original_purchase_date_ms', u'purchase_date_ms']
+    __WHITELIST__ = ['quantity', 'product_id', 'transaction_id', 'original_transaction_id', 'purchase_date', 'original_purchase_date', 'expires_date', 'cancellation_date', 'is_trial_period', 'original_purchase_date_ms', 'purchase_date_ms']
     __EXPORT_FILTERS__ = {
         'quantity': int,
         'is_trial_period': json_bool_to_native,
