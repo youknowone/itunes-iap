@@ -190,6 +190,12 @@ def test_receipt():
     assert in_app0.product_id == u'org.itunesiap'
     assert in_app0.original_transaction_id == u'1000000155715958'
     assert in_app0.quantity == 1
+    assert isinstance(in_app0.is_trial_period, bool)
+    assert not in_app0.is_trial_period  # is_trial_period is false
+    assert isinstance(in_app0.original_purchase_date_ms, int)
+    assert in_app0.original_purchase_date_ms == 1432002585000
+    assert isinstance(in_app0.purchase_date_ms, int)
+    assert in_app0.purchase_date_ms == 1432005669000
 
     # and that the last_in_app alias is set up correctly
     assert response.receipt.last_in_app == in_app[-1]
