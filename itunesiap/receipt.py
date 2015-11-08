@@ -59,7 +59,7 @@ class Receipt(ObjectMapper):
     @lazy_property
     def in_app(self):
         if 'in_app' in self._:
-            return map(InApp, self._in_app)
+            return list(map(InApp, self._in_app))
         else:
             return [InApp(self._)]
 
