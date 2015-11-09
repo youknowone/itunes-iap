@@ -16,6 +16,7 @@ class Environment(object):
     def __init__(self, **kwargs):
         self.use_production = kwargs.get('use_production', True)
         self.use_sandbox = kwargs.get('use_sandbox', False)
+        self.verify_ssl = kwargs.get('verify_ssl', True)
 
     def clone(self, **kwargs):
         options = self.extract()
@@ -54,10 +55,13 @@ class Environment(object):
             options[item] = getattr(self, item)
         return options
 
-default = Environment(use_production=True, use_sandbox=False)
-production = Environment(use_production=True, use_sandbox=False)
-sandbox = Environment(use_production=False, use_sandbox=True)
-review = Environment(use_production=True, use_sandbox=True)
+default = Environment(use_production=True, use_sandbox=False, verify_ssl=True)
+production = Environment(use_production=True, use_sandbox=False, verify_ssl=True)
+sandbox = Environment(use_production=False, use_sandbox=True, verify_ssl=True)
+review = Environment(use_production=True, use_sandbox=True, verify_ssl=True)
+
+unsafe = Environment(use_production=True, use_sandbox=True, verify_ssl=False)
+
 
 default.push()
 

@@ -10,6 +10,10 @@ class ItunesServerNotAvailable(RequestError):
     pass
 
 
+class ItunesServerNotReachable(ItunesServerNotAvailable):
+    pass
+
+
 class InvalidReceipt(RequestError):
     _req_kwargs_keys = ['status']
     _descriptions = {
@@ -25,6 +29,4 @@ class InvalidReceipt(RequestError):
 
     @property
     def description(self):
-        if self.status in self._descriptions:
-            return self._descriptions[self.status]
-        return None
+        return self._descriptions.get(self.status, None)

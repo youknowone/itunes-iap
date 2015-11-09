@@ -118,8 +118,8 @@ def test_itunes_not_available():
         try:
             request.verify()
         except itunesiap.exc.ItunesServerNotAvailable as e:
-            assert e.args[0] == 500
-            assert e.args[1] == 'Not avaliable'
+            assert e[0] == 500
+            assert e[1] == 'Not avaliable'
 
 
 def test_request_fail():
@@ -132,7 +132,7 @@ def test_request_fail():
             request.verify()
             assert False
         except itunesiap.exc.RequestError as e:
-            assert type(e.args[1]) == requests.exceptions.ReadTimeout
+            assert type(e['exc']) == requests.exceptions.ReadTimeout
 
 
 def test_ssl_request_fail():
@@ -145,7 +145,7 @@ def test_ssl_request_fail():
             request.verify(verify_request=True)
             assert False
         except itunesiap.exc.RequestError as e:
-            assert type(e.args[1]) == requests.exceptions.SSLError
+            assert type(e['exc']) == requests.exceptions.SSLError
 
 
 @pytest.mark.parametrize("sandbox_receipt", [LEGACY_RAW_RECEIPT])
