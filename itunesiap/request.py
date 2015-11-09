@@ -35,9 +35,12 @@ class Request(object):
     def verify_from(self, url):
         """Try verification from given url."""
         # If the password exists from kwargs, pass it up with the request, otherwise leave it alone
-        http_response = requests.post(url, json.dumps(self.request_content), verify=False)
-        if http_response.status_code != 200:
-            raise exceptions.ItunesServerNotAvailable(http_response.status_code, http_response.content)
+        try:
+            http_response = requests.post(url, json.dumps(self.request_content))
+            if http_response.status_code != 200:
+                raise exceptions.ItunesServerNotAvailable(http_response.status_code, http_response.content)
+        except requests.exceptions.RequestException as e:
+            raise exceptions.RequestError('There was a {0} error while performing the request'.format(type(e)))
 
         response = receipt.Response(json.loads(http_response.content.decode('utf-8')))
         if response.status != 0:
