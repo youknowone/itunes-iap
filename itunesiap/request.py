@@ -40,7 +40,7 @@ class Request(object):
             if http_response.status_code != 200:
                 raise exceptions.ItunesServerNotAvailable(http_response.status_code, http_response.content)
         except requests.exceptions.RequestException as e:
-            raise exceptions.RequestError('There was a {0} error while performing the request'.format(type(e)))
+            raise exceptions.RequestError('There was an error performing the request', e)
 
         response = receipt.Response(json.loads(http_response.content.decode('utf-8')))
         if response.status != 0:
