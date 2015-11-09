@@ -132,6 +132,18 @@ def test_request_fail():
             assert type(e.args[1]) == requests.exceptions.ReadTimeout
 
 
+def test_ssl_request_fail():
+    """Test failure making request to itunes server """
+    # We're going to return an invalid http status code
+    with patch.object(requests, 'post') as mock_post:
+        mock_post.side_effect = requests.exceptions.SSLError('Bad ssl')
+        request = itunesiap.Request('DummyReceipt')
+        try:
+            request.verify(verify_request=True)
+            assert False
+        except itunesiap.exc.RequestError as e:
+            assert type(e.args[1]) == requests.exceptions.SSLError
+
 
 @pytest.mark.parametrize("sandbox_receipt", [LEGACY_RAW_RECEIPT])
 def test_context(sandbox_receipt):
