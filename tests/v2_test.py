@@ -128,8 +128,9 @@ def test_request_fail():
         try:
             request.verify()
             assert False
-        except itunesiap.exc.RequestError:
-            assert True
+        except itunesiap.exc.RequestError as e:
+            assert type(e.args[1]) == requests.exceptions.ReadTimeout
+
 
 
 @pytest.mark.parametrize("sandbox_receipt", [LEGACY_RAW_RECEIPT])
