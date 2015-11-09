@@ -1,6 +1,9 @@
 itunes-iap v2
 ~~~~~~~~~~~~~
 
+.. image:: https://travis-ci.org/youknowone/itunes-iap.svg?branch=master
+    :target: https://travis-ci.org/youknowone/itunes-iap
+
 Note for v1 users
 -----------------
 

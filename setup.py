@@ -31,7 +31,10 @@ setup(
         'itunesiap': ['version.txt']
     },
     install_requires=[
-        'requests', 'prettyexc>=0.5.1', 'six',
+        'requests', 'prettyexc>=0.5.2', 'six', 'pytz', 'python-dateutil',
+    ],
+    tests_require=[
+        'pytest', 'tox', 'mock', 'patch',
     ],
     classifiers=[
         'Intended Audience :: Developers',

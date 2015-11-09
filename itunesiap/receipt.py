@@ -1,8 +1,41 @@
 
+import pytz
+import dateutil.parser
 import warnings
 import json
 
 from .tools import lazy_property
+
+
+def _to_datetime(value):
+    """Try to parse Apple iTunes receipt date format.
+
+    By reference, they insists it is rfc3339:
+
+        https://developer.apple.com/library/ios/releasenotes/General/ValidateAppStoreReceipt/Chapters/ReceiptFields.html#//apple_ref/doc/uid/TP40010573-CH106-SW4
+
+    Though data I got from apple server does not. So the strategy is:
+
+        - Give them a chance anyway.
+        - Or split timezone string and read it from pytz.
+    """
+    try:
+        d = dateutil.parser.parse(value)
+    except ValueError as e:
+        value, timezone = value.rsplit(' ', 1)
+        try:
+            d = dateutil.parser.parse(value + '+00:00')
+        except ValueError:
+            raise e
+        d = d.replace(tzinfo=pytz.timezone(timezone))
+    return d
+
+
+def _to_bool(data):
+    assert data in ('true', 'false'), \
+        ("Cannot convert {0}, "
+         "acceptable values are true' and 'false'".format(data))
+    return json.loads(data)
 
 
 class ObjectMapper(object):
@@ -70,18 +103,20 @@ class Receipt(ObjectMapper):
         return self.in_app[-1]
 
 
-def json_bool_to_native(data):
-    assert data in ('true', 'false'), \
-        ("Cannot convert {0}, "
-         "acceptable values are true' and 'false'".format(data))
-    return json.loads(data)
-
-
 class InApp(ObjectMapper):
-    __WHITELIST__ = ['quantity', 'product_id', 'transaction_id', 'original_transaction_id', 'purchase_date', 'original_purchase_date', 'expires_date', 'cancellation_date', 'is_trial_period', 'original_purchase_date_ms', 'purchase_date_ms']
+    __WHITELIST__ = [
+        'quantity', 'product_id', 'transaction_id', 'original_transaction_id', 'is_trial_period',
+        'purchase_date', 'original_purchase_date', 'expires_date', 'cancellation_date',
+        'purchase_date_ms', 'original_purchase_date_ms', 'expires_date_ms', 'cancellation_date_ms']
     __EXPORT_FILTERS__ = {
         'quantity': int,
-        'is_trial_period': json_bool_to_native,
-        'original_purchase_date_ms': int,
+        'is_trial_period': _to_bool,
+        'purchase_date': _to_datetime,
+        'original_purchase_date': _to_datetime,
+        'expires_date': _to_datetime,
+        'cancellation_date': _to_datetime,
         'purchase_date_ms': int,
+        'original_purchase_date_ms': int,
+        'expires_date_ms': int,
+        'cancellation_date_ms': int,
     }

@@ -6,6 +6,9 @@
 
 import json
 import requests
+import pytz
+import datetime
+
 from mock import patch
 
 import pytest
@@ -222,6 +225,7 @@ def test_receipt():
     assert in_app0.original_purchase_date_ms == 1432002585000
     assert isinstance(in_app0.purchase_date_ms, int)
     assert in_app0.purchase_date_ms == 1432005669000
+    assert in_app0.purchase_date == datetime.datetime(2013, 5, 19, 3, 21, 9).replace(tzinfo=pytz.UTC)
 
     # and that the last_in_app alias is set up correctly
     assert response.receipt.last_in_app == in_app[-1]
@@ -231,6 +235,25 @@ def test_shortcut():
     """Test shortcuts"""
     with itunesiap.env.sandbox:
         itunesiap.verify(LEGACY_RAW_RECEIPT)
+
+
+def test_date():
+    """Test to parse string dates to python dates"""
+    import pytz
+    import datetime
+
+    d = itunesiap.receipt._to_datetime(u'2013-01-01T00:00:00+09:00')
+    assert (d.year, d.month, d.day) == (2013, 1, 1)
+    assert d.tzinfo._offset == datetime.timedelta(0, 9 * 3600)
+
+    d = itunesiap.receipt._to_datetime(u'2013-01-01 00:00:00 Etc/GMT')
+    assert (d.year, d.month, d.day) == (2013, 1, 1)
+    assert d.tzinfo._utcoffset == datetime.timedelta(0)
+
+    d = itunesiap.receipt._to_datetime(u'2013-01-01 00:00:00 America/Los_Angeles')
+    assert (d.year, d.month, d.day) == (2013, 1, 1)
+    assert d.tzinfo == pytz.timezone('America/Los_Angeles')
+
 
 if __name__ == '__main__':
     pytest.main()
