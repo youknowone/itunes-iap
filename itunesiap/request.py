@@ -32,20 +32,26 @@ class Request(object):
             request_content = {'receipt-data': self.receipt_data}
         return request_content
 
-    def verify_from(self, url):
+    def verify_from(self, url, verify_request):
         """Try verification from given url."""
         # If the password exists from kwargs, pass it up with the request, otherwise leave it alone
-        http_response = requests.post(url, json.dumps(self.request_content), verify=False)
-        if http_response.status_code != 200:
-            raise exceptions.ItunesServerNotAvailable(http_response.status_code, http_response.content)
+        try:
+            http_response = requests.post(url, json.dumps(self.request_content), verify=verify_request)
+            if http_response.status_code != 200:
+                raise exceptions.ItunesServerNotAvailable(http_response.status_code, http_response.content)
+        except requests.exceptions.RequestException as e:
+            raise exceptions.RequestError('There was an error performing the request', e)
 
         response = receipt.Response(json.loads(http_response.content.decode('utf-8')))
         if response.status != 0:
             raise exceptions.InvalidReceipt(response.status, response=response)
         return response
 
-    def verify(self):
+    def verify(self, verify_request=False):
         """Try verification with current environment.
+        If verify_request is true, Apple's SSL certificiate will be
+        verified. The verify_request is set to false by default for
+        backwards compatability.
 
         Returns a `Receipt` object if succeed. Otherwise raise an exception.
         """
@@ -56,13 +62,13 @@ class Request(object):
         e = None
         if env.use_production:
             try:
-                response = self.verify_from(RECEIPT_PRODUCTION_VALIDATION_URL)
+                response = self.verify_from(RECEIPT_PRODUCTION_VALIDATION_URL, verify_request)
             except exceptions.InvalidReceipt as ee:
                 e = ee
 
         if not response and env.use_sandbox:
             try:
-                response = self.verify_from(RECEIPT_SANDBOX_VALIDATION_URL)
+                response = self.verify_from(RECEIPT_SANDBOX_VALIDATION_URL, verify_request)
             except exceptions.InvalidReceipt as ee:
                 if not env.use_production:
                     e = ee
