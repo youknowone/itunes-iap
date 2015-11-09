@@ -119,6 +119,19 @@ def test_itunes_not_available():
             assert e.args[1] == 'Not avaliable'
 
 
+def test_request_fail():
+    """Test failure making request to itunes server """
+    # We're going to return an invalid http status code
+    with patch.object(requests, 'post') as mock_post:
+        mock_post.side_effect = requests.exceptions.ReadTimeout('Timeout')
+        request = itunesiap.Request('DummyReceipt')
+        try:
+            request.verify()
+            assert False
+        except itunesiap.exc.RequestError:
+            assert True
+
+
 @pytest.mark.parametrize("sandbox_receipt", [LEGACY_RAW_RECEIPT])
 def test_context(sandbox_receipt):
     """Test sandbox receipts with real itunes server."""
