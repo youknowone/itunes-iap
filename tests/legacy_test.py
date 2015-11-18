@@ -113,7 +113,7 @@ class TestsIAP(unittest.TestCase):
         with patch.object(requests, 'post') as mock_post:
             iap_status_21007 = self.iap_response.copy()
             iap_status_21007['status'] = 21007
-            mock_post.return_value.content = json.dumps(iap_status_21007)
+            mock_post.return_value.content = json.dumps(iap_status_21007).encode('utf-8')
             mock_post.return_value.status_code = 200
             set_verification_mode('production')
             request = Request('DummyReceipt')

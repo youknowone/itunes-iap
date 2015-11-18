@@ -78,7 +78,7 @@ class Request(object):
 
     @property
     def result(self):
-        return self._extract_receipt(json.loads(self.response.content))
+        return self._extract_receipt(json.loads(self.response.content.decode('utf-8')))
 
     @property
     def request_content(self):
