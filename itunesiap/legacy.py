@@ -1,6 +1,6 @@
 
 from . import exceptions
-from .tools import lazy_property, deprecated
+from .tools import deprecated
 import requests
 import json
 import contextlib
@@ -67,6 +67,7 @@ class Request(object):
         self.password = password
         self.use_production = kwargs.get('use_production', USE_PRODUCTION)
         self.use_sandbox = kwargs.get('use_sandbox', USE_SANDBOX)
+        self.verify_ssl = kwargs.get('verify_ssl', False)
         self.response = None
 
     def __repr__(self):
@@ -75,18 +76,27 @@ class Request(object):
             valid = self.result['status'] == 0
         return u'<Request(valid:{0}, data:{1}...)>'.format(valid, self.receipt[:20])
 
-    @lazy_property
+    @property
     def result(self):
         return self._extract_receipt(json.loads(self.response.content))
 
-    def verify_from(self, url):
-        """Try verification from given url."""
-        # If the password exists from kwargs, pass it up with the request, otherwise leave it alone
+    @property
+    def request_content(self):
         if self.password is not None:
             request_content = {'receipt-data': self.receipt, 'password': self.password}
         else:
             request_content = {'receipt-data': self.receipt}
-        self.response = requests.post(url, json.dumps(request_content), verify=False)
+        return request_content
+
+    def verify_from(self, url, verify_ssl=False):
+        """Try verification from given url."""
+        # If the password exists from kwargs, pass it up with the request, otherwise leave it alone
+        post_body = json.dumps(self.request_content)
+        try:
+            self.response = requests.post(url, post_body, verify=verify_ssl)
+        except requests.exceptions.RequestException:
+            raise
+
         if self.response.status_code != 200:
             raise exceptions.ItunesServerNotAvailable(self.response.status_code, self.response.content)
 
@@ -110,28 +120,26 @@ class Request(object):
     def validate(self):
         return self.verify()
 
-    def verify(self):
+    def verify(self, verify_ssl=None):
         """Try verification with settings. Returns a Receipt object if successed.
         Or raise an exception. See `self.response` or `self.result` to see details.
         """
-        receipt = None
-        assert (self.use_production or self.use_sandbox)
-        e = None
+        assert(self.use_production or self.use_sandbox)
+        if verify_ssl is None:
+            verify_ssl = self.verify_ssl
         if self.use_production:
             try:
-                receipt = self.verify_from(RECEIPT_PRODUCTION_VALIDATION_URL)
-            except exceptions.InvalidReceipt as ee:
-                e = ee
+                receipt = self.verify_from(RECEIPT_PRODUCTION_VALIDATION_URL, verify_ssl)
+            except exceptions.InvalidReceipt:
+                if not self.use_sandbox:
+                    raise
 
-        if not receipt and self.use_sandbox:
+        if self.use_sandbox:
             try:
-                receipt = self.verify_from(RECEIPT_SANDBOX_VALIDATION_URL)
-            except exceptions.InvalidReceipt as ee:
-                if not self.use_production:
-                    e = ee
+                receipt = self.verify_from(RECEIPT_SANDBOX_VALIDATION_URL, verify_ssl)
+            except exceptions.InvalidReceipt:
+                raise
 
-        if not receipt:
-            raise e  # raise original error
         return Receipt(receipt)
 
     @contextlib.contextmanager

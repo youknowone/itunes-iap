@@ -13,6 +13,9 @@ from itunesiap.legacy import Request, Receipt, set_verification_mode
 from itunesiap.legacy import exceptions
 
 
+from tests.v2_test import LEGACY_RAW_RECEIPT
+
+
 class TestsIAP(unittest.TestCase):
 
     def __init__(self, *args, **kwargs):
@@ -90,11 +93,7 @@ class TestsIAP(unittest.TestCase):
         assert Request('').use_sandbox is True
 
     def test_request(self):
-        try:
-            from testdata import sandbox_receipt
-        except ImportError:
-            print('No receipt data to test')
-            return
+        sandbox_receipt = LEGACY_RAW_RECEIPT
 
         set_verification_mode('production')
         request = Request(sandbox_receipt)
@@ -137,12 +136,8 @@ class TestsIAP(unittest.TestCase):
                 assert e.args[1] == 'Not avaliable'
 
     def test_context(self):
-        try:
-            from testdata import sandbox_receipt
-        except ImportError:
-            print('No receipt data to test')
-            return
-        request = Request(sandbox_receipt)
+        sandbox_receipt = LEGACY_RAW_RECEIPT
+        request = Request(sandbox_receipt, verify_ssl=True)
         configs = request.use_production, request.use_sandbox
         with request.verification_mode('production'):
             try:
@@ -169,11 +164,7 @@ class TestsIAP(unittest.TestCase):
         assert receipt.unique_identifier == u'bcbdb3d45543920dd9sd5c79a72948001fc22a39'
 
     def test_shortcut(self):
-        try:
-            from testdata import sandbox_receipt
-        except ImportError:
-            print('No receipt data to test')
-            return
+        sandbox_receipt = LEGACY_RAW_RECEIPT
         mode = itunesiap.get_verification_mode()
         itunesiap.set_verification_mode('sandbox')
         itunesiap.verify(sandbox_receipt)
