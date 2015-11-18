@@ -12,9 +12,11 @@ RECEIPT_SANDBOX_VALIDATION_URL = "https://sandbox.itunes.apple.com/verifyReceipt
 
 
 class Request(object):
-    """Validation request with raw receipt. Receipt must be base64 encoded string.
+    """Validation request with raw receipt.
 
     Use `verify` method to try verification and get Receipt or exception.
+
+    :param str receipt_data: An iTunes receipt data as Base64 encoded string.
     """
 
     def __init__(self, receipt_data, password=None):
@@ -26,14 +28,22 @@ class Request(object):
 
     @property
     def request_content(self):
+        """Build request body for iTunes."""
         if self.password is not None:
             request_content = {'receipt-data': self.receipt_data, 'password': self.password}
         else:
             request_content = {'receipt-data': self.receipt_data}
         return request_content
 
-    def verify_from(self, url, verify_ssl):
-        """Try verification from given url."""
+    def verify_from(self, url, verify_ssl=True):
+        """Try verification from given url.
+
+        :param str url: iTunes verification API URL.
+        :param bool verify_ssl: SSL verification.
+
+        :return: :class:`itunesiap.receipt.Receipt` object if succeed.
+        :raises: Otherwise raise a request exception.
+        """
         # If the password exists from kwargs, pass it up with the request, otherwise leave it alone
         post_body = json.dumps(self.request_content)
         try:
@@ -51,11 +61,16 @@ class Request(object):
 
     def verify(self, **options):
         """Try verification with current environment.
-        If verify_request is true, Apple's SSL certificiate will be
-        verified. The verify_request is set to false by default for
+        If verify_ssl is true, Apple's SSL certificiate will be
+        verified. The verify_ssl is set to false by default for
         backwards compatability.
 
-        Returns a `Receipt` object if succeed. Otherwise raise an exception.
+        :param bool use_production: Override environment value if given
+        :param bool use_sandbox: Override environment value if given
+        :param bool verify_ssl: Override environment value if given
+
+        :return: :class:`itunesiap.receipt.Receipt` object if succeed.
+        :raises: Otherwise raise a request exception.
         """
         env = Environment.current()
         use_production = options.get('use_production', env.use_production)
