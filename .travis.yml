@@ -16,5 +16,7 @@ script:
   - "py.test"
 matrix:
   allow_failures:
-    - python: nightly
+    - python:
+      - pypy
+      - nightly
 sudo: false
