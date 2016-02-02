@@ -4,6 +4,7 @@ from .tools import deprecated
 import requests
 import json
 import contextlib
+from prettyexc import PrettyException as E
 
 
 RECEIPT_PRODUCTION_VALIDATION_URL = "https://buy.itunes.apple.com/verifyReceipt"
@@ -12,9 +13,6 @@ RECEIPT_SANDBOX_VALIDATION_URL = "https://sandbox.itunes.apple.com/verifyReceipt
 
 USE_PRODUCTION = True
 USE_SANDBOX = False
-
-
-from prettyexc import PrettyException as E
 
 
 class ModeNotAvailable(E):

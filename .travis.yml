@@ -6,6 +6,7 @@ python:
   - "3.4"
   - "3.5"
   - "pypy"
+  - "pypy3"
   - "nightly"
 # command to install dependencies
 install:
@@ -18,5 +19,6 @@ matrix:
   allow_failures:
     - python:
       - pypy
+      - pypy3
       - nightly
 sudo: false
