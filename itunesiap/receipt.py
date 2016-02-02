@@ -53,6 +53,9 @@ class ObjectMapper(object):
     def __getitem__(self, item):
         return self._[item]
 
+    def __setitem__(self, key, value):
+        self._[key] = value
+
     def __getattr__(self, item):
         try:
             return super(ObjectMapper, self).__getattr__(item)
