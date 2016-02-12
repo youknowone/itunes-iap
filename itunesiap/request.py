@@ -17,11 +17,13 @@ class Request(object):
     Use `verify` method to try verification and get Receipt or exception.
 
     :param str receipt_data: An iTunes receipt data as Base64 encoded string.
+    :param proxy_url: A proxy url to access the itunes validation url
     """
 
-    def __init__(self, receipt_data, password=None):
+    def __init__(self, receipt_data, password=None, proxy_url=None):
         self.receipt_data = receipt_data
         self.password = password
+        self.proxy_url = proxy_url
 
     def __repr__(self):
         return u'<Request({1}...)>'.format(self.receipt_data[:20])
@@ -47,7 +49,11 @@ class Request(object):
         # If the password exists from kwargs, pass it up with the request, otherwise leave it alone
         post_body = json.dumps(self.request_content)
         try:
-            http_response = requests.post(url, post_body, verify=verify_ssl)
+            if self.proxy_url:
+                protocol = self.proxy_url.split('://')[0]
+                http_response = requests.post(url, post_body, verify=verify_ssl, proxies={protocol: self.proxy_url})
+            else:
+                http_response = requests.post(url, post_body, verify=verify_ssl)
         except requests.exceptions.RequestException as e:
             raise exceptions.ItunesServerNotReachable(exc=e)
 
