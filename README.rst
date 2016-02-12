@@ -70,3 +70,8 @@ Put `proxy_url` for proxies.
     >>>     response = itunesiap.verify(raw_data, proxy_url='https://your.proxy.url/')
     >>> except itunesiap.exc.InvalidReceipt as e:
     >>>     ...
+
+Contributors
+------------
+
+See https://github.com/youknowone/itunes-iap/graphs/contributors
