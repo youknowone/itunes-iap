@@ -50,8 +50,8 @@ class Request(object):
         post_body = json.dumps(self.request_content)
         try:
             if self.proxy_url:
-                proxy_url = "https://" + self.proxy_url
-                http_response = requests.post(url, post_body, verify=verify_ssl, proxies={'https': proxy_url})
+                protocol = self.proxy_url.split('://')[0]
+                http_response = requests.post(url, post_body, verify=verify_ssl, proxies={protocol: self.proxy_url})
             else:
                 http_response = requests.post(url, post_body, verify=verify_ssl)
         except requests.exceptions.RequestException as e:
