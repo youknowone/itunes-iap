@@ -21,7 +21,7 @@ Create request to create a request to itunes verify api.
     >>> try:
     >>>     response = itunesiap.verify(raw_data)  # base64-encoded data
     >>> except itunesiap.exc.InvalidReceipt as e:
-    >>>     print 'invalid receipt'
+    >>>     print('invalid receipt')
     >>> print response.receipt.last_in_app.product_id  # other values are also available as property!
 
 Practical values are: product_id, original_transaction_id, quantity, unique_identifier
@@ -35,7 +35,7 @@ Create request to create a request to itunes verify api.
     >>> try:
     >>>     response = itunesiap.verify(raw_data, password)  # Just add password
     >>> except itunesiap.exc.InvalidReceipt as e:
-    >>>     print 'invalid receipt'
+    >>>     print('invalid receipt')
     >>> in_app = response.receipt.last_in_app  # Get the latest receipt returned by Apple
 
 
@@ -59,3 +59,14 @@ Or
     >>> import itunesiap
     >>> with itunesiap.env.current().clone(use_sandbox=True):  # additional change for current environment.
     >>>     response = itunesiap.verify(raw_data)
+
+Proxy
+-----
+
+Put `proxy_url` for proxies.
+
+    >>> import itunesiap
+    >>> try:
+    >>>     response = itunesiap.verify(raw_data, proxy_url='https://your.proxy.url/')
+    >>> except itunesiap.exc.InvalidReceipt as e:
+    >>>     ...
