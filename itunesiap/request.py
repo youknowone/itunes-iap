@@ -26,7 +26,7 @@ class Request(object):
         self.proxy_url = proxy_url
 
     def __repr__(self):
-        return u'<Request({1}...)>'.format(self.receipt_data[:20])
+        return u'<Request({}...)>'.format(self.receipt_data[:20])
 
     @property
     def request_content(self):
