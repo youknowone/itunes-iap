@@ -34,7 +34,7 @@ setup(
         'requests[security]', 'prettyexc>=0.6.0', 'six', 'pytz', 'python-dateutil',
     ],
     tests_require=[
-        'pytest', 'tox', 'mock', 'patch',
+        'pytest', 'pytest-cov', 'tox', 'mock', 'patch',
     ],
     classifiers=[
         'Intended Audience :: Developers',

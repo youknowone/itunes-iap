@@ -1,4 +1,5 @@
 language: python
+sudo: false
 python:
   - "2.6"
   - "2.7"
@@ -8,15 +9,16 @@ python:
   - "nightly"
 # command to install dependencies
 install:
-  - "pip install flake8 mock ."
+  - "pip install flake8 mock pytest pytest-cov python-coveralls ."
 # command to run tests
 script:
   - "flake8 --ignore=E501 ."
-  - "py.test"
+  - "py.test --cov=itunesiap -vv tests/"
+after_success:
+  - "coveralls"
 matrix:
   allow_failures:
     - python:
       - pypy
       - pypy3
       - nightly
-sudo: false

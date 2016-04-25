@@ -1,12 +1,14 @@
 
 dist
 .env
+.cache
 *.pyc
 *.egg-info
+/build
 MANIFEST
 
 .idea
 .tox
 .ropeproject
-/build
-setup.cfg
+.coveralls.yml
+.coverage
