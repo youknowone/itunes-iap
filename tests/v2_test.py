@@ -255,5 +255,11 @@ def test_date():
     assert d.tzinfo == pytz.timezone('America/Los_Angeles')
 
 
+def test_repr():
+    """Test __repr__"""
+    request = itunesiap.Request('DummyReceipt')
+    '{0!r}'.format(request)
+
+
 if __name__ == '__main__':
     pytest.main()
