@@ -1,0 +1,23 @@
+codecov:
+  branch: master
+  bot: "youknowone"
+
+coverage:
+  precision: 2
+  round: nearest
+  range: "10...90"
+
+  notify:
+    slack:
+      default:
+        url: 'https://hooks.slack.com/services/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'
+        attachment: "sunburst, diff"
+
+  status:
+    project: true
+    patch: true
+    changes: true
+
+comment:
+  layout: "header, diff, changes, sunburst, uncovered"
+  behavior: default
