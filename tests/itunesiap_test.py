@@ -148,6 +148,18 @@ def test_ssl_request_fail():
             assert type(e['exc']) == requests.exceptions.SSLError
 
 
+def test_invalid_receipt():
+    request = itunesiap.Request('wrong receipt')
+
+    with itunesiap.env.production:
+        with pytest.raises(itunesiap.exc.InvalidReceipt):
+            request.verify()
+
+    with itunesiap.env.sandbox:
+        with pytest.raises(itunesiap.exc.InvalidReceipt):
+            request.verify()
+
+
 @pytest.mark.parametrize("sandbox_receipt", [LEGACY_RAW_RECEIPT])
 def test_context(sandbox_receipt):
     """Test sandbox receipts with real itunes server."""
@@ -255,10 +267,13 @@ def test_date():
     assert d.tzinfo == pytz.timezone('America/Los_Angeles')
 
 
-def test_repr():
+@pytest.mark.parametrize("object", [
+    itunesiap.Request('DummyReceipt'),
+    itunesiap.Response('{}'),
+])
+def test_repr(object):
     """Test __repr__"""
-    request = itunesiap.Request('DummyReceipt')
-    '{0!r}'.format(request)
+    '{0!r}'.format(object)
 
 
 if __name__ == '__main__':

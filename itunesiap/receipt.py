@@ -48,7 +48,7 @@ class ObjectMapper(object):
         self._ = data
 
     def __repr__(self):
-        return u'<{}({})>'.format(self.__class__.__name__, self._)
+        return u'<{0}({1})>'.format(self.__class__.__name__, self._)
 
     def __getitem__(self, item):
         return self._[item]

@@ -23,7 +23,7 @@ env = environment  # env.default, env.sandbox, env.review
 
 __version__ = pkg_resources.resource_string('itunesiap', 'version.txt').strip()
 if PY3:
-    __version__ = __version__.decode('ascii')
+    __version__ = __version__.decode('ascii')  # pragma: no cover
 VERSION = tuple(int(v) for v in __version__.split('.'))
 
 __all__ = (

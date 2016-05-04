@@ -13,7 +13,7 @@ from itunesiap.legacy import Request, Receipt, set_verification_mode
 from itunesiap.legacy import exceptions
 
 
-from tests.v2_test import LEGACY_RAW_RECEIPT
+from tests.itunesiap_test import LEGACY_RAW_RECEIPT
 
 
 class TestsIAP(unittest.TestCase):
