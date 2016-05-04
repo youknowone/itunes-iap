@@ -27,8 +27,11 @@ class Environment(object):
         self._stack.push(self)
 
     @classmethod
-    def pop(self):
-        self._stack.pop()
+    def pop(self, ctx_id=None):
+        if ctx_id is None:
+            self._stack.pop(ctx_id)
+        else:
+            self._stack.pop()
 
     def __enter__(self):
         self._ctx_id = len(self._stack)
