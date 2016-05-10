@@ -18,12 +18,14 @@ Quick example
 
 Create request to create a request to itunes verify api.
 
-    >>> import itunesiap
-    >>> try:
-    >>>     response = itunesiap.verify(raw_data)  # base64-encoded data
-    >>> except itunesiap.exc.InvalidReceipt as e:
-    >>>     print('invalid receipt')
-    >>> print response.receipt.last_in_app.product_id  # other values are also available as property!
+.. sourcecode:: python
+
+   >>> import itunesiap
+   >>> try:
+   >>>     response = itunesiap.verify(raw_data)  # base64-encoded data
+   >>> except itunesiap.exc.InvalidReceipt as e:
+   >>>     print('invalid receipt')
+   >>> print response.receipt.last_in_app.product_id  # other values are also available as property!
 
 Practical values are: product_id, original_transaction_id, quantity, unique_identifier
 
@@ -32,12 +34,14 @@ Quick example with password (Apple Shared Secret)
 
 Create request to create a request to itunes verify api.
 
-    >>> import itunesiap
-    >>> try:
-    >>>     response = itunesiap.verify(raw_data, password)  # Just add password
-    >>> except itunesiap.exc.InvalidReceipt as e:
-    >>>     print('invalid receipt')
-    >>> in_app = response.receipt.last_in_app  # Get the latest receipt returned by Apple
+.. sourcecode:: python
+
+   >>> import itunesiap
+   >>> try:
+   >>>     response = itunesiap.verify(raw_data, password)  # Just add password
+   >>> except itunesiap.exc.InvalidReceipt as e:
+   >>>     print('invalid receipt')
+   >>> in_app = response.receipt.last_in_app  # Get the latest receipt returned by Apple
 
 
 Verification policy
@@ -45,32 +49,40 @@ Verification policy
 
 Set verification mode for production or sandbox api. Review mode also available for appstore review.
 
-    >>> import itunesiap
-    >>> with itunesiap.env.review:
-    >>>     response = itunesiap.verify(raw_data)  # `review` enables both production and sandbox for appstore review. `production`, `sandbox`, `review` or `default` possible.
+.. sourcecode:: python
+
+   >>> import itunesiap
+   >>> with itunesiap.env.review:
+   >>>     response = itunesiap.verify(raw_data)  # `review` enables both production and sandbox for appstore review. `production`, `sandbox`, `review` or `default` possible.
 
 Or
 
-    >>> import itunesiap
-    >>> itunesiap.env.review.push()  # explicitly pushed context
-    >>> response = request.verify()
+.. sourcecode:: python
+
+   >>> import itunesiap
+   >>> itunesiap.env.review.push()  # explicitly pushed context
+   >>> response = request.verify()
 
 Or
 
-    >>> import itunesiap
-    >>> with itunesiap.env.current().clone(use_sandbox=True):  # additional change for current environment.
-    >>>     response = itunesiap.verify(raw_data)
+.. sourcecode:: python
+
+   >>> import itunesiap
+   >>> with itunesiap.env.current().clone(use_sandbox=True):  # additional change for current environment.
+   >>>     response = itunesiap.verify(raw_data)
 
 Proxy
 -----
 
 Put `proxy_url` for proxies.
 
-    >>> import itunesiap
-    >>> try:
-    >>>     response = itunesiap.verify(raw_data, proxy_url='https://your.proxy.url/')
-    >>> except itunesiap.exc.InvalidReceipt as e:
-    >>>     ...
+.. sourcecode:: python
+
+   >>> import itunesiap
+   >>> try:
+   >>>     response = itunesiap.verify(raw_data, proxy_url='https://your.proxy.url/')
+   >>> except itunesiap.exc.InvalidReceipt as e:
+   >>>     ...
 
 Contributors
 ------------
