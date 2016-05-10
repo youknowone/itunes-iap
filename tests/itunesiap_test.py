@@ -238,6 +238,8 @@ def test_receipt():
     assert isinstance(in_app0.purchase_date_ms, int)
     assert in_app0.purchase_date_ms == 1432005669000
     assert in_app0.purchase_date == datetime.datetime(2013, 5, 19, 3, 21, 9).replace(tzinfo=pytz.UTC)
+    assert in_app0._purchase_date == '2013-05-19 03:21:09 Etc/GMT'
+    assert in_app0._purchase_date == in_app0['purchase_date']
 
     # and that the last_in_app alias is set up correctly
     assert response.receipt.last_in_app == in_app[-1]
@@ -265,6 +267,9 @@ def test_date():
     d = itunesiap.receipt._to_datetime(u'2013-01-01 00:00:00 America/Los_Angeles')
     assert (d.year, d.month, d.day) == (2013, 1, 1)
     assert d.tzinfo == pytz.timezone('America/Los_Angeles')
+
+    with pytest.raises(ValueError):
+        itunesiap.receipt._to_datetime(u'wrong date')
 
 
 @pytest.mark.parametrize("object", [
