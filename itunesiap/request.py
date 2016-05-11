@@ -91,7 +91,7 @@ class Request(object):
                 response = self.verify_from(RECEIPT_PRODUCTION_VALIDATION_URL, verify_ssl)
             except exceptions.InvalidReceipt:
                 if not use_sandbox and (response is None or
-                        response.status != STATUS_SANDBOX_RECEIPT_ERROR):
+                                        response.status != STATUS_SANDBOX_RECEIPT_ERROR):
                     raise
 
         if not response and use_sandbox:
