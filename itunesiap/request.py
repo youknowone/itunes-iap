@@ -9,6 +9,7 @@ from .environment import Environment
 
 RECEIPT_PRODUCTION_VALIDATION_URL = "https://buy.itunes.apple.com/verifyReceipt"
 RECEIPT_SANDBOX_VALIDATION_URL = "https://sandbox.itunes.apple.com/verifyReceipt"
+STATUS_SANDBOX_RECEIPT_ERROR = 21007
 
 
 class Request(object):
@@ -88,8 +89,8 @@ class Request(object):
         if use_production:
             try:
                 response = self.verify_from(RECEIPT_PRODUCTION_VALIDATION_URL, verify_ssl)
-            except exceptions.InvalidReceipt:
-                if not use_sandbox:
+            except exceptions.InvalidReceipt as e:
+                if not use_sandbox or e.status != STATUS_SANDBOX_RECEIPT_ERROR:
                     raise
 
         if not response and use_sandbox:
