@@ -30,3 +30,7 @@ class InvalidReceipt(RequestError):
     @property
     def description(self):
         return self._descriptions.get(self.status, None)
+
+
+class MissingFieldError(E, AttributeError, KeyError):
+    pass

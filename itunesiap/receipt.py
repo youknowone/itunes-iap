@@ -4,6 +4,7 @@ import dateutil.parser
 import warnings
 import json
 
+from .exceptions import MissingFieldError
 from .tools import lazy_property
 
 
@@ -57,16 +58,19 @@ class ObjectMapper(object):
         try:
             return super(ObjectMapper, self).__getattr__(item)
         except AttributeError:
-            if item.startswith('_'):
-                key = item[1:]
-                if key not in self.__WHITELIST__:
-                    warnings.warn('Given key `{0}` is not in __WHITELIST__. It maybe a wrong key. Check raw data `_` for real receipt data.'.format(key))
-                return self._[key]
-            if item in self.__EXPORT_FILTERS__:
-                filter = self.__EXPORT_FILTERS__[item]
-                return filter(self._[item])
-            if item in self.__WHITELIST__:
-                return self._[item]
+            try:
+                if item.startswith('_'):
+                    key = item[1:]
+                    if key not in self.__WHITELIST__:
+                        warnings.warn('Given key `{0}` is not in __WHITELIST__. It maybe a wrong key. Check raw data `_` for real receipt data.'.format(key))
+                    return self._[key]
+                if item in self.__EXPORT_FILTERS__:
+                    filter = self.__EXPORT_FILTERS__[item]
+                    return filter(self._[item])
+                if item in self.__WHITELIST__:
+                    return self._[item]
+            except KeyError:
+                raise MissingFieldError(item)
             return super(ObjectMapper, self).__getattribute__(item)
 
 

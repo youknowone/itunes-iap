@@ -244,6 +244,12 @@ def test_receipt():
     # and that the last_in_app alias is set up correctly
     assert response.receipt.last_in_app == in_app[-1]
 
+    with pytest.raises(AttributeError):
+        response.receipt.in_app[0].expires_date
+    with pytest.raises(KeyError):
+        response.receipt.in_app[0].expires_date
+        # ensure we can also catch this with KeyError due to backward compatibility
+
 
 def test_shortcut():
     """Test shortcuts"""
