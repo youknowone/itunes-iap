@@ -21,10 +21,11 @@ class Request(object):
     :param proxy_url: A proxy url to access the itunes validation url
     """
 
-    def __init__(self, receipt_data, password=None, proxy_url=None):
+    def __init__(self, receipt_data, password=None, proxy_url=None, timeout=60):
         self.receipt_data = receipt_data
         self.password = password
         self.proxy_url = proxy_url
+        self.timeout = timeout
 
     def __repr__(self):
         return u'<Request({0}...)>'.format(self.receipt_data[:20])
@@ -52,9 +53,9 @@ class Request(object):
         try:
             if self.proxy_url:
                 protocol = self.proxy_url.split('://')[0]
-                http_response = requests.post(url, post_body, verify=verify_ssl, proxies={protocol: self.proxy_url})
+                http_response = requests.post(url, post_body, verify=verify_ssl, proxies={protocol: self.proxy_url}, timeout=self.timeout)
             else:
-                http_response = requests.post(url, post_body, verify=verify_ssl)
+                http_response = requests.post(url, post_body, verify=verify_ssl, timeout=self.timeout)
         except requests.exceptions.RequestException as e:
             raise exceptions.ItunesServerNotReachable(exc=e)
 
