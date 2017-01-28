@@ -58,6 +58,7 @@ class Environment(object):
             options[item] = getattr(self, item)
         return options
 
+
 default = Environment(use_production=True, use_sandbox=False, verify_ssl=True)
 production = Environment(use_production=True, use_sandbox=False, verify_ssl=True)
 sandbox = Environment(use_production=False, use_sandbox=True, verify_ssl=True)

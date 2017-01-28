@@ -6,20 +6,21 @@ python:
   - "3.3"
   - "3.4"
   - "3.5"
+  - "3.6"
+  - "pypy-5.4.1"
   - "nightly"
 # command to install dependencies
 install:
-  - "pip install flake8 mock pytest pytest-cov python-coveralls ."
+  - "pip install --upgrade pip"
+  - "pip install flake8 python-coveralls '.[tests]'"
 # command to run tests
 script:
   - "flake8 --ignore=E501 ."
-  - "py.test --cov=itunesiap -vv tests/"
+  - "pytest --cov=itunesiap -vv tests/"
 after_success:
   - "coveralls"
   - bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
 matrix:
   allow_failures:
-    - python:
-      - pypy
-      - pypy3
-      - nightly
+    - python: "2.6"
+    - python: "nightly"

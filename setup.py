@@ -16,6 +16,11 @@ def get_readme():
         return ''
 
 
+tests_require = [
+    'pytest>=3.0.0', 'pytest-cov', 'tox', 'mock', 'patch',
+]
+
+
 setup(
     name='itunes-iap',
     version=get_version(),
@@ -33,9 +38,10 @@ setup(
     install_requires=[
         'requests[security]', 'prettyexc>=0.6.0', 'six', 'pytz', 'python-dateutil',
     ],
-    tests_require=[
-        'pytest', 'pytest-cov', 'tox', 'mock', 'patch',
-    ],
+    tests_require=tests_require,
+    extras_require={
+        'tests': tests_require,
+    },
     classifiers=[
         'Intended Audience :: Developers',
         'Operating System :: OS Independent',
@@ -48,5 +54,6 @@ setup(
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
     ],
 )
