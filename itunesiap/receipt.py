@@ -40,7 +40,7 @@ def _to_bool(data):
 
 
 class ObjectMapper(object):
-    """Pretty interface for decoded receipt obejct.
+    """Pretty interface for decoded receipt object.
     """
     __WHITELIST__ = []
     __EXPORT_FILTERS__ = {}

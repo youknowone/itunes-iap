@@ -8,7 +8,7 @@ class EnvironmentStack(list):
 
 
 class Environment(object):
-    """Environement provides option preset for `Request`. `default` is default"""
+    """Environment provides option preset for `Request`. `default` is default"""
 
     ITEMS = ('use_production', 'use_sandbox')
     _stack = EnvironmentStack()
