@@ -32,7 +32,7 @@ def config_from_mode(mode):
 
 def set_verification_mode(mode):
     """Set global verification mode that where allows production or sandbox.
-    `production`, `sandbox`, `review` or `reject` availble. Otherwise raise
+    `production`, `sandbox`, `review` or `reject` available. Otherwise raise
     an exception.
 
     `production`: Allows production receipts only. Default.
@@ -104,7 +104,7 @@ class Request(object):
         return self.result
 
     def _extract_receipt(self, receipt_data):
-        """There are two formats that itunes iap purchase receipts are
+        """There are two formats that iTunes iap purchase receipts are
         sent back in
         """
         if 'receipt' not in receipt_data:
@@ -119,7 +119,7 @@ class Request(object):
         return self.verify()
 
     def verify(self, verify_ssl=None):
-        """Try verification with settings. Returns a Receipt object if successed.
+        """Try verification with settings. Returns a Receipt object if succeeded.
         Or raise an exception. See `self.response` or `self.result` to see details.
         """
         assert(self.use_production or self.use_sandbox)
@@ -149,7 +149,7 @@ class Request(object):
 
 
 class Receipt(object):
-    """Pretty interface for decoded receipt obejct.
+    """Pretty interface for decoded receipt object.
     """
     def __init__(self, data):
         self.data = data
@@ -181,10 +181,10 @@ class Receipt(object):
 
 
 def verify(data, test_paid=lambda id: id):
-    """Convinient verification shortcut.
+    """Convenient verification shortcut.
 
-    :param data: Itunes receipt data
-    :param test_paid: Function to test the recept is paid. Function should
+    :param data: iTunes receipt data
+    :param test_paid: Function to test the receipt is paid. Function should
         raise error to disallow response. Parameter is `original_transaction_id`
     :return: :class:`itunesiap.core.Response`
     """

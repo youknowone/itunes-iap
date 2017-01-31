@@ -18,7 +18,7 @@ class Request(object):
     Use `verify` method to try verification and get Receipt or exception.
 
     :param str receipt_data: An iTunes receipt data as Base64 encoded string.
-    :param proxy_url: A proxy url to access the itunes validation url
+    :param proxy_url: A proxy url to access the iTunes validation url
     """
 
     def __init__(self, receipt_data, password=None, proxy_url=None):
@@ -70,7 +70,7 @@ class Request(object):
         """Try verification with current environment.
         If verify_ssl is true, Apple's SSL certificiate will be
         verified. The verify_ssl is set to false by default for
-        backwards compatability.
+        backwards compatibility.
 
         :param bool use_production: Override environment value if given
         :param bool use_sandbox: Override environment value if given

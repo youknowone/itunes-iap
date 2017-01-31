@@ -4,8 +4,8 @@ import functools
 
 
 class lazy_property(object):
-    '''http://stackoverflow.com/questions/3012421/python-lazy-property-decorator
-    '''
+    """http://stackoverflow.com/questions/3012421/python-lazy-property-decorator
+    """
 
     def __init__(self, function):
         self.function = function
@@ -17,11 +17,11 @@ class lazy_property(object):
 
 
 def deprecated(func):
-    '''https://wiki.python.org/moin/PythonDecoratorLibrary#Generating_Deprecation_Warnings
+    """https://wiki.python.org/moin/PythonDecoratorLibrary#Generating_Deprecation_Warnings
 
     This is a decorator which can be used to mark functions
     as deprecated. It will result in a warning being emitted
-    when the function is used.'''
+    when the function is used."""
 
     @functools.wraps(func)
     def new_func(*args, **kwargs):
