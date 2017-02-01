@@ -72,6 +72,7 @@ class Request(object):
         verified. The verify_ssl is set to false by default for
         backwards compatibility.
 
+        :param Environment env: Override environment if given
         :param bool use_production: Override environment value if given
         :param bool use_sandbox: Override environment value if given
         :param bool verify_ssl: Override environment value if given
@@ -79,7 +80,9 @@ class Request(object):
         :return: :class:`itunesiap.receipt.Receipt` object if succeed.
         :raises: Otherwise raise a request exception.
         """
-        env = Environment.current()
+        env = options.get('env')
+        if not env:
+            env = Environment.current()
         use_production = options.get('use_production', env.use_production)
         use_sandbox = options.get('use_sandbox', env.use_sandbox)
         verify_ssl = options.get('verify_ssl', env.verify_ssl)
