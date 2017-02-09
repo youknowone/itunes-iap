@@ -3,7 +3,8 @@ itunes-iap v2
 
 .. image:: https://travis-ci.org/youknowone/itunes-iap.svg?branch=master
     :target: https://travis-ci.org/youknowone/itunes-iap
-.. image:: https://coveralls.io/repos/github/youknowone/itunes-iap/badge.svg?branch=master :target: https://coveralls.io/github/youknowone/itunes-iap?branch=master
+.. image:: https://coveralls.io/repos/github/youknowone/itunes-iap/badge.svg?branch=master
+    :target: https://coveralls.io/github/youknowone/itunes-iap?branch=master
 
 Note for v1 users
 -----------------
