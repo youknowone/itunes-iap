@@ -9,7 +9,11 @@ Itunes In-app Purchase verification api.
 """
 
 from six import PY3
-import pkg_resources
+try:
+    import pkg_resources
+except ImportError:
+    # pkg_resource is not available on Google App Engine
+    pkg_resources = None
 
 from .request import Request
 from .receipt import Response, Receipt, InApp
@@ -21,10 +25,13 @@ from . import environment
 exc = exceptions
 env = environment  # env.default, env.sandbox, env.review
 
-__version__ = pkg_resources.resource_string('itunesiap', 'version.txt').strip()
-if PY3:
-    __version__ = __version__.decode('ascii')  # pragma: no cover
-VERSION = tuple(int(v) for v in __version__.split('.'))
+if pkg_resources is not None:
+    __version__ = pkg_resources.resource_string('itunesiap', 'version.txt').strip()
+    if PY3:
+        __version__ = __version__.decode('ascii')  # pragma: no cover
+    VERSION = tuple(int(v) for v in __version__.split('.'))
+else:
+    __version__ = VERSION = None
 
 __all__ = (
     'Request', 'Response', 'Receipt', 'InApp', 'verify',
