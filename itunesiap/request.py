@@ -21,10 +21,11 @@ class Request(object):
     :param proxy_url: A proxy url to access the iTunes validation url
     """
 
-    def __init__(self, receipt_data, password=None, proxy_url=None):
+    def __init__(self, receipt_data, password=None, proxy_url=None, timeout=60):
         self.receipt_data = receipt_data
         self.password = password
         self.proxy_url = proxy_url
+        self.timeout = timeout
 
     def __repr__(self):
         return u'<Request({0}...)>'.format(self.receipt_data[:20])
@@ -52,9 +53,9 @@ class Request(object):
         try:
             if self.proxy_url:
                 protocol = self.proxy_url.split('://')[0]
-                http_response = requests.post(url, post_body, verify=verify_ssl, proxies={protocol: self.proxy_url})
+                http_response = requests.post(url, post_body, verify=verify_ssl, proxies={protocol: self.proxy_url}, timeout=self.timeout)
             else:
-                http_response = requests.post(url, post_body, verify=verify_ssl)
+                http_response = requests.post(url, post_body, verify=verify_ssl, timeout=self.timeout)
         except requests.exceptions.RequestException as e:
             raise exceptions.ItunesServerNotReachable(exc=e)
 
@@ -92,6 +93,7 @@ class Request(object):
         if use_production:
             try:
                 response = self.verify_from(RECEIPT_PRODUCTION_VALIDATION_URL, verify_ssl)
+                response.env = 'production'
             except exceptions.InvalidReceipt as e:
                 if not use_sandbox or e.status != STATUS_SANDBOX_RECEIPT_ERROR:
                     raise
@@ -99,6 +101,7 @@ class Request(object):
         if not response and use_sandbox:
             try:
                 response = self.verify_from(RECEIPT_SANDBOX_VALIDATION_URL, verify_ssl)
+                response.env = 'sandbox'
             except exceptions.InvalidReceipt:
                 raise
 

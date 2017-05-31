@@ -90,6 +90,13 @@ class Response(ObjectMapper):
     def latest_receipt(self):
         return Receipt(self._latest_receipt)
 
+    @property
+    def env(self):
+        return self._['env'] if 'env' in self._ else ''
+
+    @env.setter
+    def env(self, value):
+        self._['env'] = value
 
 class Receipt(ObjectMapper):
     __WHITELIST__ = ['in_app']
