@@ -1,5 +1,6 @@
 
 import json
+import functools
 
 import requests
 
@@ -18,14 +19,16 @@ class Request(object):
     Use `verify` method to try verification and get Receipt or exception.
 
     :param str receipt_data: An iTunes receipt data as Base64 encoded string.
-    :param proxy_url: A proxy url to access the iTunes validation url
+    :param proxy_url: A proxy url to access the iTunes validation url.
     """
 
-    def __init__(self, receipt_data, password=None, proxy_url=None, exclude_old_transactions=False):
+    def __init__(
+            self, receipt_data, password=None, exclude_old_transactions=False,
+            **kwargs):
         self.receipt_data = receipt_data
         self.password = password
-        self.proxy_url = proxy_url
         self.exclude_old_transactions = exclude_old_transactions
+        self.proxy_url = kwargs.pop('proxy_url', None)
 
     def __repr__(self):
         return u'<Request({0}...)>'.format(self.receipt_data[:20])
@@ -33,10 +36,11 @@ class Request(object):
     @property
     def request_content(self):
         """Build request body for iTunes."""
+        request_content = {
+            'receipt-data': self.receipt_data,
+            'exclude-old-transactions': self.exclude_old_transactions}
         if self.password is not None:
-            request_content = {'receipt-data': self.receipt_data, 'password': self.password, 'exclude-old-transactions': self.exclude_old_transactions}
-        else:
-            request_content = {'receipt-data': self.receipt_data, 'exclude-old-transactions': self.exclude_old_transactions}
+            request_content['password'] = self.password
         return request_content
 
     def verify_from(self, url, verify_ssl=True):
@@ -50,12 +54,13 @@ class Request(object):
         """
         # If the password exists from kwargs, pass it up with the request, otherwise leave it alone
         post_body = json.dumps(self.request_content)
+        if self.proxy_url:
+            protocol = self.proxy_url.split('://')[0]
+            requests_post = functools.partial(requests.post, proxies={protocol: self.proxy_url})
+        else:
+            requests_post = requests.post
         try:
-            if self.proxy_url:
-                protocol = self.proxy_url.split('://')[0]
-                http_response = requests.post(url, post_body, verify=verify_ssl, proxies={protocol: self.proxy_url})
-            else:
-                http_response = requests.post(url, post_body, verify=verify_ssl)
+            http_response = requests_post(url, post_body, verify=verify_ssl)
         except requests.exceptions.RequestException as e:
             raise exceptions.ItunesServerNotReachable(exc=e)
 
