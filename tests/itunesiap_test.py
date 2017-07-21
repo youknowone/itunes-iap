@@ -90,6 +90,12 @@ def test_sandbox_request(raw_receipt):
         response = request.verify()
     assert response.status == 0
 
+    """Test optional old transaction exclusion parameter"""
+    request = itunesiap.Request(raw_receipt)
+    with itunesiap.env.sandbox:
+        response = request.verify(exclude_old_transactions=True)
+    assert response.status == 0
+
 
 def test_invalid_responses():
     """Test invalid responses error statuses"""

@@ -21,10 +21,11 @@ class Request(object):
     :param proxy_url: A proxy url to access the iTunes validation url
     """
 
-    def __init__(self, receipt_data, password=None, proxy_url=None):
+    def __init__(self, receipt_data, password=None, proxy_url=None, exclude_old_transactions=False):
         self.receipt_data = receipt_data
         self.password = password
         self.proxy_url = proxy_url
+        self.exclude_old_transactions = exclude_old_transactions
 
     def __repr__(self):
         return u'<Request({0}...)>'.format(self.receipt_data[:20])
@@ -33,9 +34,9 @@ class Request(object):
     def request_content(self):
         """Build request body for iTunes."""
         if self.password is not None:
-            request_content = {'receipt-data': self.receipt_data, 'password': self.password}
+            request_content = {'receipt-data': self.receipt_data, 'password': self.password, 'exclude-old-transactions': self.exclude_old_transactions}
         else:
-            request_content = {'receipt-data': self.receipt_data}
+            request_content = {'receipt-data': self.receipt_data, 'exclude-old-transactions': self.exclude_old_transactions}
         return request_content
 
     def verify_from(self, url, verify_ssl=True):
