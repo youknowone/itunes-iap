@@ -53,24 +53,15 @@ Set verification mode for production or sandbox api. Review mode also available 
 .. sourcecode:: python
 
    >>> import itunesiap
-   >>> with itunesiap.env.review:
-   >>>     response = itunesiap.verify(raw_data)  # `review` enables both production and sandbox for appstore review. `production`, `sandbox`, `review` or `default` possible.
+   >>> # `review` enables both production and sandbox for appstore review. `production`, `sandbox` or `review` is available.
+   >>> response = request.verify(raw_data, env=itunesiap.env.review)
 
 Or
 
 .. sourcecode:: python
 
    >>> import itunesiap
-   >>> itunesiap.env.review.push()  # explicitly pushed context
-   >>> response = request.verify()
-
-Or
-
-.. sourcecode:: python
-
-   >>> import itunesiap
-   >>> with itunesiap.env.current().clone(use_sandbox=True):  # additional change for current environment.
-   >>>     response = itunesiap.verify(raw_data)
+   >>> response = itunesiap.verify(raw_data, use_sandbox=True):  # additional change for current environment.
 
 Proxy
 -----

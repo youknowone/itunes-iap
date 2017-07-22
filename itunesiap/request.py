@@ -87,8 +87,8 @@ class Request(object):
         :raises: Otherwise raise a request exception.
         """
         env = options.get('env')
-        if not env:
-            env = Environment.current()
+        if not env:  # backward compitibility
+            env = Environment._stack[-1]
         use_production = options.get('use_production', env.use_production)
         use_sandbox = options.get('use_sandbox', env.use_sandbox)
         verify_ssl = options.get('verify_ssl', env.verify_ssl)

@@ -28,8 +28,8 @@ def deprecated(func):
         warnings.warn_explicit(
             "Call to deprecated function {0}.".format(func.__name__),
             category=UserWarning,
-            filename=func.func_code.co_filename,
-            lineno=func.func_code.co_firstlineno + 1
+            filename=func.__code__.co_filename,
+            lineno=func.__code__.co_firstlineno + 1
         )
         return func(*args, **kwargs)
     return new_func

@@ -1,8 +1,11 @@
 
+from itunesiap.tools import deprecated
+
 __all__ = ('Environment', 'default', 'production', 'sandbox', 'review', 'current')
 
 
 class EnvironmentStack(list):
+    @deprecated
     def push(self, env):
         self.append(env)
 
@@ -24,15 +27,22 @@ class Environment(object):
         options.update(**kwargs)
         return self.__class__(**options)
 
+    @deprecated
+    def push(self):
+        self._stack.push(self)
+
+    @deprecated
     def __enter__(self):
         self._ctx_id = len(self._stack)
         self._stack.push(self)
         return self
 
+    @deprecated
     def __exit__(self, exc_type, exc_value, tb):
         self._stack.pop(self._ctx_id)
 
     @classmethod
+    @deprecated
     def current(cls):
         return cls._stack[-1]
 
@@ -60,8 +70,9 @@ review = Environment(use_production=True, use_sandbox=True, verify_ssl=True)
 unsafe = Environment(use_production=True, use_sandbox=True, verify_ssl=False)
 
 
-Environment._stack.push(default)
+Environment._stack.push(default)  # for backward compatibility
 
 
+@deprecated
 def current():
     return Environment.current()

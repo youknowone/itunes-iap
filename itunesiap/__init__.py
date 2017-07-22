@@ -22,7 +22,7 @@ env = environment  # env.default, env.sandbox, env.review
 
 try:
     import pkg_resources
-except ImportError:
+except ImportError:  # pragma: no cover
     __version__ = VERSION = None
 else:
     __version__ = pkg_resources.resource_string(

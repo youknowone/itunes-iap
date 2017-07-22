@@ -109,9 +109,12 @@ class Receipt(ObjectMapper):
 
 class InApp(ObjectMapper):
     __WHITELIST__ = [
-        'quantity', 'product_id', 'transaction_id', 'original_transaction_id', 'is_trial_period',
-        'purchase_date', 'original_purchase_date', 'expires_date', 'cancellation_date',
-        'purchase_date_ms', 'original_purchase_date_ms', 'expires_date_ms', 'cancellation_date_ms', 'expires_date_formatted', ]
+        'unique_identifier', 'quantity', 'product_id', 'transaction_id',
+        'original_transaction_id', 'is_trial_period',
+        'purchase_date', 'original_purchase_date',
+        'expires_date', 'cancellation_date',
+        'purchase_date_ms', 'original_purchase_date_ms', 'expires_date_ms',
+        'cancellation_date_ms', 'expires_date_formatted', ]
     __EXPORT_FILTERS__ = {
         'quantity': int,
         'is_trial_period': _to_bool,
