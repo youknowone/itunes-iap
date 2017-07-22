@@ -168,6 +168,11 @@ def test_receipt(itunes_response):
         # ensure we can also catch this with KeyError due to backward compatibility
 
 
+def test_timeout():
+    with pytest.raises(itunesiap.exceptions.ItunesServerNotReachable):
+        itunesiap.verify('DummyReceipt', timeout=0.0001)
+
+
 def test_shortcut(raw_receipt_legacy):
     """Test shortcuts"""
     itunesiap.verify(raw_receipt_legacy, env=itunesiap.env.sandbox)
