@@ -17,25 +17,16 @@ class Environment(object):
         self.use_production = kwargs.get('use_production', True)
         self.use_sandbox = kwargs.get('use_sandbox', False)
         self.verify_ssl = kwargs.get('verify_ssl', True)
+        self.exclude_old_transactions = kwargs.get('exclude_old_transactions', False)
 
     def clone(self, **kwargs):
         options = self.extract()
         options.update(**kwargs)
         return self.__class__(**options)
 
-    def push(self):
-        self._stack.push(self)
-
-    @classmethod
-    def pop(self, ctx_id=None):
-        if ctx_id is None:
-            self._stack.pop(ctx_id)
-        else:
-            self._stack.pop()
-
     def __enter__(self):
         self._ctx_id = len(self._stack)
-        self.push()
+        self._stack.push(self)
         return self
 
     def __exit__(self, exc_type, exc_value, tb):
@@ -52,7 +43,9 @@ class Environment(object):
                 setattr(self, item, kwargs[item])
 
     def extract(self):
-        """Extract options from `self` and merge to `kwargs` and return new object."""
+        """Extract options from `self` and merge to `kwargs` then return a new
+        dictionary with the values.
+        """
         options = {}
         for item in self.ITEMS:
             options[item] = getattr(self, item)
@@ -67,7 +60,7 @@ review = Environment(use_production=True, use_sandbox=True, verify_ssl=True)
 unsafe = Environment(use_production=True, use_sandbox=True, verify_ssl=False)
 
 
-default.push()
+Environment._stack.push(default)
 
 
 def current():
