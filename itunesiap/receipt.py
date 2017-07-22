@@ -104,7 +104,8 @@ class Receipt(ObjectMapper):
 
     @property
     def last_in_app(self):
-        return self.in_app[-1]
+        return sorted(
+            self.in_app, key=lambda x: x['original_purchase_date_ms'])[-1]
 
 
 class InApp(ObjectMapper):
