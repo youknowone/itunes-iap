@@ -6,16 +6,8 @@ itunes-iap v2
 .. image:: https://coveralls.io/repos/github/youknowone/itunes-iap/badge.svg?branch=master
     :target: https://coveralls.io/github/youknowone/itunes-iap?branch=master
 
-Note for v1 users
+The quick example
 -----------------
-
-There was breaking changes between v1 and v2 APIs.
-
-- Specify version `0.6.6` for latest v1 API when you don't need new APIs.
-- Or use `import itunesiap.legacy as itunesiap` instead of `import itunesiap`. (`from itunesiap import xxx` to `from itunesiap.legacy import xxx`)
-
-Quick example
--------------
 
 Create request to create a request to itunes verify api.
 
@@ -28,53 +20,38 @@ Create request to create a request to itunes verify api.
    >>>     print('invalid receipt')
    >>> print response.receipt.last_in_app.product_id  # other values are also available as property!
 
-Practical values are: product_id, original_transaction_id, quantity, unique_identifier
+Practically useful attributes are:
+    `product_id`, `original_transaction_id`, `quantity` and `unique_identifier`.
 
-Quick example with password (Apple Shared Secret)
--------------------------------------------------
-
-Create request to create a request to itunes verify api.
-
-.. sourcecode:: python
-
-   >>> import itunesiap
-   >>> try:
-   >>>     response = itunesiap.verify(raw_data, password)  # Just add password
-   >>> except itunesiap.exc.InvalidReceipt as e:
-   >>>     print('invalid receipt')
-   >>> in_app = response.receipt.last_in_app  # Get the latest receipt returned by Apple
+See the full document in :class:`itunesiap.receipt.InApp`.
 
 
-Verification policy
--------------------
+Apple in-review mode
+--------------------
 
-Set verification mode for production or sandbox api. Review mode also available for appstore review.
+In review mode, your actual users who use older versions want to verify in
+production server but the reviewers in Apple office want to verify in sandbox
+server.
+
+Note: The default env is `production` mode which doesn't allow any sandbox
+verifications.
+
+You can change the verifying mode by specifying `env`.
 
 .. sourcecode:: python
 
-   >>> import itunesiap
-   >>> # `review` enables both production and sandbox for appstore review. `production`, `sandbox` or `review` is available.
-   >>> response = request.verify(raw_data, env=itunesiap.env.review)
+    >>> # review mode
+    >>> itunesiap.verify(raw_data, env=itunesiap.env.review)
 
-Or
 
-.. sourcecode:: python
+Note for v1 users
+-----------------
 
-   >>> import itunesiap
-   >>> response = itunesiap.verify(raw_data, use_sandbox=True):  # additional change for current environment.
+There was breaking changes between v1 and v2 APIs.
 
-Proxy
------
+- Specify version `0.6.6` for latest v1 API when you don't need new APIs.
+- Or use `import itunesiap.legacy as itunesiap` instead of `import itunesiap`. (`from itunesiap import xxx` to `from itunesiap.legacy import xxx`)
 
-Put `proxy_url` for proxies.
-
-.. sourcecode:: python
-
-   >>> import itunesiap
-   >>> try:
-   >>>     response = itunesiap.verify(raw_data, proxy_url='https://your.proxy.url/')
-   >>> except itunesiap.exc.InvalidReceipt as e:
-   >>>     ...
 
 Contributors
 ------------

@@ -17,9 +17,13 @@ class Request(object):
     """Validation request with raw receipt.
 
     Use `verify` method to try verification and get Receipt or exception.
+    For detail, see also the Apple document: `<https://developer.apple.com/library/content/releasenotes/General/ValidateAppStoreReceipt/Chapters/ValidateRemotely.html>`_.
 
     :param str receipt_data: An iTunes receipt data as Base64 encoded string.
+    :param str password: Only used for receipts that contain auto-renewable subscriptions. Your app's shared secret (a hexadecimal string).
+    :param bool exclude_old_transactions: Only used for iOS7 style app receipts that contain auto-renewable or non-renewing subscriptions. If value is true, response includes only the latest renewal transaction for any subscriptions.
     :param proxy_url: A proxy url to access the iTunes validation url.
+        (It is an attribute of :func:`verify` but misplaced here)
     """
 
     def __init__(
@@ -29,13 +33,17 @@ class Request(object):
         self.password = password
         self.exclude_old_transactions = exclude_old_transactions
         self.proxy_url = kwargs.pop('proxy_url', None)
+        if kwargs:  # pragma: no cover
+            raise TypeError(
+                u"__init__ got unexpected keyword argument {}".format(
+                    ', '.join(kwargs.keys())))
 
     def __repr__(self):
         return u'<Request({0}...)>'.format(self.receipt_data[:20])
 
     @property
     def request_content(self):
-        """Build request body for iTunes."""
+        """Instantly built request body for iTunes."""
         request_content = {
             'receipt-data': self.receipt_data,
             'exclude-old-transactions': self.exclude_old_transactions}
@@ -44,9 +52,13 @@ class Request(object):
         return request_content
 
     def verify_from(self, url, timeout=None, verify_ssl=True):
-        """Try verification from given url.
+        """The actual implemention of verification request.
+
+        :func:`verify` calls this method to try to verifying for each servers.
 
         :param str url: iTunes verification API URL.
+        :param float timeout: The value is connection timeout of the verifying
+            request. The default value is 30.0 when no `env` is given.
         :param bool verify_ssl: SSL verification.
 
         :return: :class:`itunesiap.receipt.Receipt` object if succeed.
@@ -78,10 +90,24 @@ class Request(object):
         verified. The verify_ssl is set to false by default for
         backwards compatibility.
 
-        :param Environment env: Override environment if given
-        :param bool use_production: Override environment value if given
-        :param bool use_sandbox: Override environment value if given
-        :param bool verify_ssl: Override environment value if given
+        See also:
+            - Receipt_Validation_Programming_Guide_.
+
+        .. _Receipt_Validation_Programming_Guide: https://developer.apple.com/library/content/releasenotes/General/ValidateAppStoreReceipt/Chapters/ValidateRemotely.html
+
+        :param itunesiap.environment.Environment env: Override the environment.
+        :param float timeout: The value is connection timeout of the verifying
+            request. The default value is 30.0 when no `env` is given.
+        :param bool use_production: The value is weather verifying in
+            production server or not. The default value is :class:`bool` True
+            when no `env` is given.
+        :param bool use_sandbox: The value is weather verifying in
+            sandbox server or not. The default value is :class:`bool` False
+            when no `env` is given.
+
+        :param bool verify_ssl: The value is weather enabling SSL verification
+            or not. WARNING: DO NOT TURN IT OFF WITHOUT A PROPER REASON. IF YOU
+            DON'T UNDERSTAND WHAT IT MEANS, NEVER SET IT YOURSELF.
 
         :return: :class:`itunesiap.receipt.Receipt` object if succeed.
         :raises: Otherwise raise a request exception.

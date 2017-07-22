@@ -42,6 +42,7 @@ setup(
     tests_require=tests_require,
     extras_require={
         'tests': tests_require,
+        'doc': ['sphinx'],
     },
     classifiers=[
         'Intended Audience :: Developers',

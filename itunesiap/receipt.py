@@ -1,4 +1,9 @@
+''':mod:`itunesiap.receipt`
 
+Response and Receipt module.
+
+
+'''
 import pytz
 import dateutil.parser
 import warnings

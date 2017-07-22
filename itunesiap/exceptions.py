@@ -7,14 +7,15 @@ class RequestError(E):
 
 
 class ItunesServerNotAvailable(RequestError):
-    pass
+    '''iTunes server is not available. No response.'''
 
 
 class ItunesServerNotReachable(ItunesServerNotAvailable):
-    pass
+    '''iTunes server is not reachable - including connection timeout.'''
 
 
 class InvalidReceipt(RequestError):
+    '''A receipt was given by iTunes server but it has error.'''
     _req_kwargs_keys = ['status']
     _descriptions = {
         21000: 'The App Store could not read the JSON object you provided.',

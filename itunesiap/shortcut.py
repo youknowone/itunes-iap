@@ -4,16 +4,47 @@ from .request import Request
 
 def verify(
         receipt_data, password=None, exclude_old_transactions=False, **kwargs):
-    """Shortcut API for :class:`itunesiap.request.Request`
+    """Shortcut API for :class:`itunesiap.request.Request`.
 
-    :param str receipt_data: An iTunes receipt data as Base64 encoded string.
-    :param proxy_url: A proxy url to access the iTunes validation url
-    :param bool use_production: Override environment value if given
-    :param bool use_sandbox: Override environment value if given
-    :param bool verify_ssl: Override environment value if given
+    See also:
+        - Receipt_Validation_Programming_Guide_.
+
+    .. _Receipt_Validation_Programming_Guide: https://developer.apple.com/library/content/releasenotes/General/ValidateAppStoreReceipt/Chapters/ValidateRemotely.html
+
+    :param str receipt_data: :class:`itunesiap.request.Request` variable.
+        An iTunes receipt data as Base64 encoded string.
+    :param str password: :class:`itunesiap.request.Request` variable. Optional.
+        Only used for receipts that contain auto-renewable subscriptions. Your
+        app's shared secret (a hexadecimal string).
+    :param bool exclude_old_transactions: :class:`itunesiap.request.Request`
+        variable. Optional. Only used for iOS7 style app receipts that contain
+        auto-renewable or non-renewing subscriptions. If value is true,
+        response includes only the latest renewal transaction for any
+        subscriptions.
+
+    :param itunesiap.environment.Environment env: Set base environment value.
+        See :mod:`itunesiap.environment` for detail.
+    :param float timeout: :func:`itunesiap.request.Request.verify` variable.
+        Keyword-only optional. The value is connection timeout of the verifying
+        request. The default value is 30.0 when no `env` is given.
+    :param bool use_production: :func:`itunesiap.request.Request.verify`
+        variable. Keyword-only optional. The value is weather verifying in
+        production server or not. The default value is :class:`bool` True
+        when no `env` is given.
+    :param bool use_sandbox: :func:`itunesiap.request.Request.verify`
+        variable. Keyword-only optional. The value is weather verifying in
+        sandbox server or not. The default value is :class:`bool` False
+        when no `env` is given.
+
+    :param bool verify_ssl: :func:`itunesiap.request.Request.verify` variable.
+        Keyword-only optional. The value is weather enabling SSL verification
+        or not. WARNING: DO NOT TURN IT OFF WITHOUT A PROPER REASON. IF YOU
+        DON'T UNDERSTAND WHAT IT MEANS, NEVER SET IT YOURSELF.
+    :param str proxy_url: Keyword-only optional. A proxy url to access the
+        iTunes validation url.
 
     :return: :class:`itunesiap.receipt.Receipt` object if succeed.
-    :raises: Otherwise raise a request exception.
+    :raises: Otherwise raise a request exception in :mod:`itunesiap.exceptions`.
     """
     proxy_url = kwargs.pop('proxy_url', None)
     request = Request(
