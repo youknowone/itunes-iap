@@ -61,8 +61,9 @@ class ObjectMapper(object):
             try:
                 if item.startswith('_'):
                     key = item[1:]
-                    if key not in self.__WHITELIST__:
-                        warnings.warn('Given key `{0}` is not in __WHITELIST__. It maybe a wrong key. Check raw data `_` for real receipt data.'.format(key))
+                    if key not in self.__WHITELIST__:  # pragma: no cover
+                        warnings.warn(
+                            'Given key `{0}` is not in __WHITELIST__. It maybe a wrong key. Check raw data `_` for real receipt data.'.format(key))
                     return self._[key]
                 if item in self.__EXPORT_FILTERS__:
                     filter = self.__EXPORT_FILTERS__[item]
