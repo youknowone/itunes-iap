@@ -1,4 +1,8 @@
+""":mod:`itunesiap.receipt`
 
+A successful response returns a JSON object including receipts. To manipulate
+them in convinient way, `itunes-iap` wrapped it with :class:`ObjectMapper`.
+"""
 import pytz
 import dateutil.parser
 import warnings
@@ -40,7 +44,29 @@ def _to_bool(data):
 
 
 class ObjectMapper(object):
-    """Pretty interface for decoded receipt object.
+    """A pretty interface for decoded receipt object.
+
+    `__WHITELIST__` is a managed list of names. They are regarded as safe
+    values and guaranteed to be converted in python representation when needed.
+    `__EXPORT_FILTERS__` decides how to convert raw data to python
+    representation.
+
+    To access to the converted value, use a dictionary key as an attribute name.
+    For example, the key `receipt` is accessible by:
+
+    .. sourcecode:: python
+
+        >>> mapper.receipt  # return converted python object Receipt
+        >>> # == Receipt(mapper._['receipt'])
+
+    To access to the raw JSON value, use a dictionary key as an attribute name
+    but with the prefix `_`. For example, the key `receipt` is accessible by:
+
+        >>> mapper._receipt  # return converted python object Receipt
+        >>> # == mapper._['receipt']
+
+    :param dict data: A JSON object.
+    :return: :class:`ObjectMapper`
     """
     __WHITELIST__ = []
     __EXPORT_FILTERS__ = {}
@@ -78,7 +104,8 @@ class ObjectMapper(object):
 class Response(ObjectMapper):
     """The root response.
 
-    status: See https://developer.apple.com/library/ios/releasenotes/General/ValidateAppStoreReceipt/Chapters/ValidateRemotely.html#//apple_ref/doc/uid/TP40010573-CH104-SW1
+    About the value of status:
+        - See https://developer.apple.com/library/ios/releasenotes/General/ValidateAppStoreReceipt/Chapters/ValidateRemotely.html#//apple_ref/doc/uid/TP40010573-CH104-SW1
     """
     __WHITELIST__ = ['receipt', 'latest_receipt']  # latest_receipt_info
     __EXPORT_FILTERS__ = {'status': int}
@@ -93,11 +120,22 @@ class Response(ObjectMapper):
 
 
 class Receipt(ObjectMapper):
+    """The actual receipt.
+
+    The receipt may hold only one purchase directly in receipt object or may
+    hold multiple purchases in `in_app` key.
+    This object encapsulate it to list of :class:`InApp` object in `in_app`
+    property.
+    """
     __WHITELIST__ = ['in_app']
     __EXPORT_FILTERS__ = {}
 
     @lazy_property
     def in_app(self):
+        """The list of purchases. If the receipt has receipt keys in the
+        receipt body, it still will be wrapped as an :class:`InApp` and consists
+        of this property
+        """
         if 'in_app' in self._:
             return list(map(InApp, self._in_app))
         else:
@@ -105,11 +143,26 @@ class Receipt(ObjectMapper):
 
     @property
     def last_in_app(self):
+        """The last item in `in_app` property order by purchase_date."""
         return sorted(
             self.in_app, key=lambda x: x['original_purchase_date_ms'])[-1]
 
 
 class InApp(ObjectMapper):
+    """The individual purchases.
+
+    The major keys are `unique_identifier`, `quantity`, `product_id` and
+    `transaction_id`. `quantty` and `product_id` mean what kind of product and
+    and how many of them the customer bought. `unique_identifier` and
+    `transaction_id` is used to check where it is processed and track related
+    purchases.
+
+    For the detail, see also Apple docs.
+
+    Any `date` related keys will be converted to python
+    :class:`datetime.datetime` object. The quantity and any `date_ms` related
+    keys will be converted to python :class:`int`.
+    """
     __WHITELIST__ = [
         'unique_identifier', 'quantity', 'product_id', 'transaction_id',
         'original_transaction_id', 'is_trial_period',
