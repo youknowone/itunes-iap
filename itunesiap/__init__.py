@@ -12,7 +12,7 @@ from six import PY3
 
 from .request import Request
 from .receipt import Response, Receipt, InApp
-from .shortcut import verify
+from .shortcut import verify, aioverify
 
 from . import exceptions
 from . import environment
@@ -33,5 +33,5 @@ else:
 
 
 __all__ = (
-    'Request', 'Response', 'Receipt', 'InApp', 'verify',
+    'Request', 'Response', 'Receipt', 'InApp', 'verify', 'aioverify',
     'exceptions', 'exc', 'environment', 'env')

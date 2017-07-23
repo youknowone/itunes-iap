@@ -50,3 +50,11 @@ def verify(
     request = Request(
         receipt_data, password, exclude_old_transactions, proxy_url=proxy_url)
     return request.verify(**kwargs)
+
+
+def aioverify(
+        receipt_data, password=None, exclude_old_transactions=False, **kwargs):
+    proxy_url = kwargs.pop('proxy_url', None)
+    request = Request(
+        receipt_data, password, exclude_old_transactions, proxy_url=proxy_url)
+    return request.aioverify(**kwargs)
