@@ -5,6 +5,7 @@ Request
 
 .. autoclass:: itunesiap.request.Request
     :members:
+    :inherited-members:
 
 .. automodule:: itunesiap.exceptions
 

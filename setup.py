@@ -1,5 +1,6 @@
 from __future__ import with_statement
 
+import sys
 from setuptools import setup
 
 
@@ -16,10 +17,21 @@ def get_readme():
         return ''
 
 
+install_requires = [
+    'requests[security]', 'prettyexc>=0.6.0',
+    'six', 'pytz', 'python-dateutil',
+]
 tests_require = [
     'pytest>=3.0.0', 'pytest-cov', 'tox', 'mock', 'patch',
 ]
 
+if sys.version_info[:2] >= (3, 4):
+    install_requires.extend([
+        'aiohttp', 'aiodns',
+    ])
+    tests_require.extend([
+        'pytest-asyncio==0.5.0'
+    ])
 
 setup(
     name='itunes-iap',
@@ -35,10 +47,7 @@ setup(
     package_data={
         'itunesiap': ['version.txt']
     },
-    install_requires=[
-        'requests[security]', 'prettyexc>=0.6.0',
-        'six', 'pytz', 'python-dateutil',
-    ],
+    install_requires=install_requires,
     tests_require=tests_require,
     extras_require={
         'tests': tests_require,

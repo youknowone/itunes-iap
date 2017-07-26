@@ -6,6 +6,11 @@ itunes-iap v2
 .. image:: https://coveralls.io/repos/github/youknowone/itunes-iap/badge.svg?branch=master
     :target: https://coveralls.io/github/youknowone/itunes-iap?branch=master
 
+- Source code: `<https://github.com/youknowone/itunes-iap>`_
+- Documentation: `<http://itunes-iap.readthedocs.io/>`_
+- Distribution: `<https://pypi.python.org/pypi/itunes-iap/>`_
+
+
 The quick example
 -----------------
 
