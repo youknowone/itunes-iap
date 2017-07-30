@@ -4,7 +4,7 @@ from itunesiap.verify_requests import RequestsVerify
 
 try:
     from itunesiap.verify_aiohttp import AiohttpVerify
-except (SyntaxError, ImportError):
+except (SyntaxError, ImportError):  # pragma: no cover
     class AiohttpVerify(object):
         pass
 

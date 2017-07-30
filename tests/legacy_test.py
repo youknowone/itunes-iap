@@ -42,6 +42,7 @@ class TestsIAP(unittest.TestCase):
         # Response with multiple in_app's
         self.iap_response_in_app = {
             u'status': 0,
+            u'latest_receipt': u'__RECEIPT_DATA',
             u'receipt': {
                 u'original_purchase_date_pst': u'2013-01-01 00:00:00 America/Los_Angeles',
                 u'version_external_identifier': 0,
@@ -161,6 +162,10 @@ class TestsIAP(unittest.TestCase):
         assert receipt.original_transaction_id == u'1000000012345678'  # original transaction id
         assert receipt.quantity == u'1'  # check quantity
         assert receipt.unique_identifier == u'bcbdb3d45543920dd9sd5c79a72948001fc22a39'
+
+    def test_receipt2(self):
+        receipt = Receipt(self.iap_response_in_app)
+        assert receipt.latest_receipt
 
     def test_shortcut(self):
         sandbox_receipt = raw_receipt_legacy()

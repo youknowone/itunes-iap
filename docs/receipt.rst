@@ -7,17 +7,17 @@ Receipt
     :members:
 
 .. autoclass:: itunesiap.receipt.Response
-    :members: __EXPORT_FILTERS__, __WHITELIST__
+    :members: __OPAQUE_FIELDS__, __FIELD_ADAPTERS__, __DOCUMENTED_FIELDS__, __UNDOCUMENTED_FIELDS__
     :special-members:
     :undoc-members:
 
 .. autoclass:: itunesiap.receipt.Receipt
-    :members: __EXPORT_FILTERS__, __WHITELIST__
+    :members: __OPAQUE_FIELDS__, __FIELD_ADAPTERS__, __DOCUMENTED_FIELDS__, __UNDOCUMENTED_FIELDS__
     :special-members:
     :undoc-members:
 
 .. autoclass:: itunesiap.receipt.InApp
-    :members: __EXPORT_FILTERS__, __WHITELIST__
+    :members: __OPAQUE_FIELDS__, __FIELD_ADAPTERS__, __DOCUMENTED_FIELDS__, __UNDOCUMENTED_FIELDS__
     :special-members:
     :undoc-members:
 

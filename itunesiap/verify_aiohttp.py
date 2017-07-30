@@ -21,9 +21,10 @@ class AiohttpVerify:
                 response_text = yield from http_response.text()
                 raise exceptions.ItunesServerNotAvailable(http_response.status, response_text)
             response_body = yield from http_response.text()
-            response = receipt.Response(json.loads(response_body))
+            response_data = json.loads(response_body)
+            response = receipt.Response(response_data)
             if response.status != 0:
-                raise exceptions.InvalidReceipt(response.status, response=response)
+                raise exceptions.InvalidReceipt(response_data)
             return response
 
     @asyncio.coroutine

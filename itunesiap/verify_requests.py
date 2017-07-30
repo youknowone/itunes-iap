@@ -8,6 +8,10 @@ from . import exceptions
 from .environment import Environment
 
 
+class InvalidReceiptResponse(exceptions.InvalidReceipt, receipt.Response):
+    pass
+
+
 class RequestsVerify(object):
     def verify_from(self, url, timeout=None, verify_ssl=True):
         """The actual implemention of verification request.
@@ -37,9 +41,10 @@ class RequestsVerify(object):
         if http_response.status_code != 200:
             raise exceptions.ItunesServerNotAvailable(http_response.status_code, http_response.content)
 
-        response = receipt.Response(json.loads(http_response.content.decode('utf-8')))
+        response_data = json.loads(http_response.content.decode('utf-8'))
+        response = receipt.Response(response_data)
         if response.status != 0:
-            raise exceptions.InvalidReceipt(response.status, response=response)
+            raise exceptions.InvalidReceipt(response_data=response_data)
         return response
 
     def verify(self, **options):
