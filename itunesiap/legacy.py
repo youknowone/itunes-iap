@@ -68,7 +68,7 @@ class Request(object):
         self.verify_ssl = kwargs.get('verify_ssl', False)
         self.response = None
 
-    def __repr__(self):
+    def __repr__(self):  # pragma: no cover
         valid = None
         if self.result:
             valid = self.result['status'] == 0
@@ -92,7 +92,7 @@ class Request(object):
         post_body = json.dumps(self.request_content)
         try:
             self.response = requests.post(url, post_body, verify=verify_ssl)
-        except requests.exceptions.RequestException:
+        except requests.exceptions.RequestException:  # pragma: no cover
             raise
 
         if self.response.status_code != 200:
@@ -100,7 +100,9 @@ class Request(object):
 
         status = self.result['status']
         if status != 0:
-            raise exceptions.InvalidReceipt(status, receipt=self.result.get('receipt', None))
+            e = exceptions.InvalidReceipt(self.result)
+            e.receipt = self.result.get('receipt', None)
+            raise e
         return self.result
 
     def _extract_receipt(self, receipt_data):
@@ -115,7 +117,7 @@ class Request(object):
         return receipt_data
 
     @deprecated
-    def validate(self):
+    def validate(self):  # pragma: no cover
         return self.verify()
 
     def verify(self, verify_ssl=None):
@@ -135,7 +137,7 @@ class Request(object):
         if self.use_sandbox:
             try:
                 receipt = self.verify_from(RECEIPT_SANDBOX_VALIDATION_URL, verify_ssl)
-            except exceptions.InvalidReceipt:
+            except exceptions.InvalidReceipt:  # pragma: no cover
                 raise
 
         return Receipt(receipt)
@@ -156,7 +158,7 @@ class Receipt(object):
         self.receipt = data['receipt']
         self.receipt_keys = list(self.receipt.keys())
 
-    def __repr__(self):
+    def __repr__(self):  # pragma: no cover
         return u'<Receipt({0}, {1})>'.format(self.status, self.receipt)
 
     @property

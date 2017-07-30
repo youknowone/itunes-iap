@@ -7,9 +7,23 @@ import pytz
 import dateutil.parser
 import warnings
 import json
+from collections import defaultdict
+from prettyexc import PrettyException
 
-from .exceptions import MissingFieldError
 from .tools import lazy_property
+
+__all__ = ('WARN_UNDOCUMENTED_FIELDS', 'Response', 'Receipt', 'InApp')
+
+
+WARN_UNDOCUMENTED_FIELDS = True
+WARN_UNLISTED_FIELDS = True
+
+_warned_undocumented_fields = defaultdict(bool)
+_warned_unlisted_field = defaultdict(bool)
+
+
+class MissingFieldError(PrettyException, AttributeError, KeyError):
+    """A Backward compatibility error."""
 
 
 def _to_datetime(value):
@@ -46,10 +60,13 @@ def _to_bool(data):
 class ObjectMapper(object):
     """A pretty interface for decoded receipt object.
 
-    `__WHITELIST__` is a managed list of names. They are regarded as safe
-    values and guaranteed to be converted in python representation when needed.
-    `__EXPORT_FILTERS__` decides how to convert raw data to python
-    representation.
+    `__DOCUMENTED_FIELDS__` and `__UNDOCUMENTED_FIELDS__` are managed lists of
+    field names. They are regarded as safe values and guaranteed to be
+    converted in python representation when needed.
+    When a field exists in `__OPAQUE_FIELDS__`, its result will be redirected.
+    The common type is :class:`str`.
+    When a field exists in `__FIELD_ADAPTERS__`, it will be converted to
+    corresponding python data representation.
 
     To access to the converted value, use a dictionary key as an attribute name.
     For example, the key `receipt` is accessible by:
@@ -57,66 +74,106 @@ class ObjectMapper(object):
     .. sourcecode:: python
 
         >>> mapper.receipt  # return converted python object Receipt
-        >>> # == Receipt(mapper._['receipt'])
+        >>> # == Receipt(mapper['receipt'])
 
     To access to the raw JSON value, use a dictionary key as an attribute name
     but with the prefix `_`. For example, the key `receipt` is accessible by:
 
         >>> mapper._receipt  # return converted python object Receipt
-        >>> # == mapper._['receipt']
+        >>> # == mapper['receipt']
 
     :param dict data: A JSON object.
     :return: :class:`ObjectMapper`
     """
-    __WHITELIST__ = []
-    __EXPORT_FILTERS__ = {}
+    __OPAQUE_FIELDS__ = frozenset([])
+    __FIELD_ADAPTERS__ = {}
+    __DOCUMENTED_FIELDS__ = frozenset([])
+    __UNDOCUMENTED_FIELDS__ = frozenset([])
 
     def __init__(self, data):
         self._ = data
 
     def __repr__(self):
-        return u'<{0}({1})>'.format(self.__class__.__name__, self._)
+        return u'<{self.__class__.__name__}({self._})>'.format(self=self)
 
     def __getitem__(self, item):
         return self._[item]
 
-    def __getattr__(self, item):
+    def __contains__(self, item):
+        return item in self._
+
+    def __getattr__(self, name):
         try:
-            return super(ObjectMapper, self).__getattr__(item)
+            return self.__getattribute__(name)
         except AttributeError:
-            try:
-                if item.startswith('_'):
-                    key = item[1:]
-                    if key not in self.__WHITELIST__:  # pragma: no cover
-                        warnings.warn(
-                            'Given key `{0}` is not in __WHITELIST__. It maybe a wrong key. Check raw data `_` for real receipt data.'.format(key))
+            if name.startswith('_'):
+                key = name[1:]
+                if key in self.__DOCUMENTED_FIELDS__:
+                    pass
+                elif key in self.__UNDOCUMENTED_FIELDS__:
+                    self.warn_undocumented(key)
+                else:
+                    self.warn_unlisted(key)
+                try:
                     return self._[key]
-                if item in self.__EXPORT_FILTERS__:
-                    filter = self.__EXPORT_FILTERS__[item]
-                    return filter(self._[item])
-                if item in self.__WHITELIST__:
-                    return self._[item]
-            except KeyError:
-                raise MissingFieldError(item)
-            return super(ObjectMapper, self).__getattribute__(item)
+                except KeyError:
+                    raise MissingFieldError(name)
 
+            if name in self.__DOCUMENTED_FIELDS__:
+                pass
+            elif name in self.__UNDOCUMENTED_FIELDS__:
+                self.warn_undocumented(name)
+            else:
+                self.warn_unlisted(name)
 
-class Response(ObjectMapper):
-    """The root response.
+            if name in self.__OPAQUE_FIELDS__:
+                def _get(_self):
+                    try:
+                        value = _self._[name]
+                    except:
+                        raise MissingFieldError(name)
+                    return value
+                setattr(self.__class__, name, property(_get))
+            elif name in self.__FIELD_ADAPTERS__:
+                def _get(_self):
+                    field_filter = self.__FIELD_ADAPTERS__[name]
+                    try:
+                        value = _self._[name]
+                    except KeyError:
+                        raise MissingFieldError(name)
+                    return field_filter(value)
+                setattr(self.__class__, name, lazy_property(_get))
+            else:
+                pass  # unhandled. raise AttributeError
+        return self.__getattribute__(name)
 
-    About the value of status:
-        - See https://developer.apple.com/library/ios/releasenotes/General/ValidateAppStoreReceipt/Chapters/ValidateRemotely.html#//apple_ref/doc/uid/TP40010573-CH104-SW1
-    """
-    __WHITELIST__ = ['receipt', 'latest_receipt']  # latest_receipt_info
-    __EXPORT_FILTERS__ = {'status': int}
+    @classmethod
+    def from_list(cls, data_list):
+        return [cls(data) for data in data_list]
 
-    @lazy_property
-    def receipt(self):
-        return Receipt(self._receipt)
+    @staticmethod
+    def warn_undocumented(name):
+        if not WARN_UNDOCUMENTED_FIELDS or _warned_undocumented_fields[name]:
+            return
+        warnings.warn(
+            "The given field '{name}' is an undocumented field. "
+            "The behavior is neither documented nor guaranteed by Apple. "
+            "To suppress further warnings, set the "
+            "`itunesiap.receipt.WARN_UNDOCUMENTED_FIELDS` False"
+            .format(name=name))
+        _warned_undocumented_fields[name] = True
 
-    @lazy_property
-    def latest_receipt(self):
-        return Receipt(self._latest_receipt)
+    @staticmethod
+    def warn_unlisted(name):
+        if not WARN_UNLISTED_FIELDS or _warned_unlisted_field[name]:
+            return
+        warnings.warn(
+            "The given field '{name}' is an unlisted field. "
+            "If the field actually exists, ignore this warning message. "
+            "To suppress further warnings, please report it to itunes-iap "
+            "project or set the `itunesiap.receipt.WARN_UNLISTED_FIELDS` "
+            "False.".format(name=name))
+        _warned_unlisted_field[name] = True
 
 
 class Receipt(ObjectMapper):
@@ -126,9 +183,49 @@ class Receipt(ObjectMapper):
     hold multiple purchases in `in_app` key.
     This object encapsulate it to list of :class:`InApp` object in `in_app`
     property.
+
+    See also: `<https://developer.apple.com/library/content/releasenotes/General/ValidateAppStoreReceipt/Chapters/ReceiptFields.html>`_
     """
-    __WHITELIST__ = ['in_app']
-    __EXPORT_FILTERS__ = {}
+    __OPAQUE_FIELDS__ = frozenset([
+        'bundle_id',
+        'application_version',
+        'original_application_version',
+        'app_item_id',
+        'version_external_identifier',
+    ])
+    __FIELD_ADAPTERS__ = {
+        'receipt_creation_date': _to_datetime,
+        'receipt_creation_date_ms': int,
+        'receipt_expiration_date': _to_datetime,
+        'receipt_expiration_date_ms': int,
+        'original_purchase_date': _to_datetime,
+        'original_purchase_date_ms': int,
+        'request_date': _to_datetime,
+        'request_date_ms': int,
+    }
+    __DOCUMENTED_FIELDS__ = frozenset([
+        'bundle_id',
+        'in_app',
+        'application_version',
+        'original_application_version',
+        'receipt_creation_date',
+        'receipt_creation_date_ms',
+        'receipt_expiration_date',
+        'receipt_expiration_date_ms',
+        'app_item_id',
+        'version_external_identifier',
+    ])
+    __UNDOCUMENTED_FIELDS__ = frozenset([
+        'request_date',
+        'request_date_ms',
+        'version_external_identifier',
+        'original_purchase_date',
+        'original_purchase_date_ms',
+    ])
+
+    @lazy_property
+    def single_purchase(self):
+        return Purchase(self._)
 
     @lazy_property
     def in_app(self):
@@ -139,7 +236,7 @@ class Receipt(ObjectMapper):
         if 'in_app' in self._:
             return list(map(InApp, self._in_app))
         else:
-            return [InApp(self._)]
+            return [self.single_purchase]
 
     @property
     def last_in_app(self):
@@ -148,11 +245,11 @@ class Receipt(ObjectMapper):
             self.in_app, key=lambda x: x['original_purchase_date_ms'])[-1]
 
 
-class InApp(ObjectMapper):
+class Purchase(ObjectMapper):
     """The individual purchases.
 
-    The major keys are `unique_identifier`, `quantity`, `product_id` and
-    `transaction_id`. `quantty` and `product_id` mean what kind of product and
+    The major keys are `quantity`, `product_id` and `transaction_id`.
+    `quantty` and `product_id` mean what kind of product and
     and how many of them the customer bought. `unique_identifier` and
     `transaction_id` is used to check where it is processed and track related
     purchases.
@@ -163,23 +260,123 @@ class InApp(ObjectMapper):
     :class:`datetime.datetime` object. The quantity and any `date_ms` related
     keys will be converted to python :class:`int`.
     """
-    __WHITELIST__ = [
-        'unique_identifier', 'quantity', 'product_id', 'transaction_id',
-        'original_transaction_id', 'is_trial_period',
-        'purchase_date', 'original_purchase_date',
-        'expires_date', 'cancellation_date',
-        'purchase_date_ms', 'original_purchase_date_ms', 'expires_date_ms',
-        'cancellation_date_ms', 'expires_date_formatted', ]
-    __EXPORT_FILTERS__ = {
+    __OPAQUE_FIELDS__ = frozenset([
+        'product_id',
+        'transaction_id',
+        'original_transaction_id',
+        'web_order_line_item_id',
+        'unique_identifier',
+    ])
+    __FIELD_ADAPTERS__ = {
         'quantity': int,
-        'is_trial_period': _to_bool,
         'purchase_date': _to_datetime,
+        'purchase_date_ms': int,
         'original_purchase_date': _to_datetime,
+        'original_purchase_date_ms': int,
         'expires_date': _to_datetime,
         'expires_date_formatted': _to_datetime,
-        'cancellation_date': _to_datetime,
-        'purchase_date_ms': int,
-        'original_purchase_date_ms': int,
         'expires_date_ms': int,
+        'is_trial_period': _to_bool,
+        'cancellation_date': _to_datetime,
         'cancellation_date_ms': int,
+        'cancellation_reason': int,
     }
+    __DOCUMENTED_FIELDS__ = frozenset([
+        'quantity',
+        'product_id',
+        'transaction_id',
+        'original_transaction_id',
+        'purchase_date',
+        'purchase_date_ms',  # de facto documented
+        'original_purchase_date',
+        'original_purchase_date_ms',  # de facto documented
+        'expires_date',
+        'expires_date_ms',  # de facto documented
+        'is_trial_period',
+        'cancellation_date',
+        'cancellation_date_ms',  # de facto documented
+        'cancellation_reason',
+        'web_order_line_item_id',
+    ])
+    __UNDOCUMENTED_FIELDS__ = frozenset([
+        'unique_identifier',
+        'expires_date_formatted',  # legacy receipts has this field as actual "expires_date"
+    ])
+
+    def __eq__(self, other):
+        if not isinstance(other, Purchase):  # pragma: no cover
+            return False
+        return self._ == other._
+
+    @lazy_property
+    def expires_date(self):
+        if 'expires_date_formatted' in self:
+            return _to_datetime(self['expires_date_formatted'])
+        try:
+            value = self['expires_date']
+        except:
+            raise MissingFieldError('expires_date')
+        return _to_datetime(value)
+
+
+class InApp(Purchase):
+    pass
+
+
+class PendingRenewalInfo(ObjectMapper):
+    __OPAQUE_FIELDS__ = frozenset([
+        'auto_renew_product_id',
+    ])
+    __FIELD_ADAPTERS__ = {
+        'auto_renew_status': int,
+        'expiration_intent': int,
+        'is_in_billing_retry_period': int,
+    }
+    __DOCUMENTED_FIELDS__ = frozenset([
+        'expiration_intent',
+        'auto_renew_status',
+        'auto_renew_product_id',
+        'is_in_billing_retry_period',
+    ])
+    __UNDOCUMENTED_FIELDS__ = frozenset([
+    ])
+
+
+class Response(ObjectMapper):
+    """The root response.
+
+    About the value of status:
+        - See https://developer.apple.com/library/ios/releasenotes/General/ValidateAppStoreReceipt/Chapters/ValidateRemotely.html#//apple_ref/doc/uid/TP40010573-CH104-SW1
+    """
+    __OPAQUE_FIELDS__ = frozenset([
+        'latest_receipt',
+    ])
+    __FIELD_ADAPTERS__ = {
+        'status': int,
+        'receipt': Receipt,
+        'pending_renewal_info': PendingRenewalInfo.from_list,
+    }
+    __DOCUMENTED_FIELDS__ = frozenset([
+        'status',
+        'receipt',
+        'latest_receipt',
+        'latest_receipt_info',
+        # 'latest_expired_receipt_info',
+        'pending_renewal_info',
+        # is-retryable
+    ])
+    __UNDOCUMENTED_FIELDS__ = frozenset([
+    ])
+
+    @lazy_property
+    def latest_receipt_info(self):
+        if 'latest_receipt_info' not in self:
+            # not an auto-renew purchase
+            raise MissingFieldError('latest_receipt_info')
+        info = self['latest_receipt_info']
+        if isinstance(info, dict):  # iOS6 style
+            return Purchase(info)
+        elif isinstance(info, list):  # iOS7 style
+            return InApp.from_list(info)
+        else:  # pragma: no cover
+            assert False

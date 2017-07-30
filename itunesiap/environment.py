@@ -101,22 +101,22 @@ class Environment(object):
     _stack = EnvironmentStack()
 
     @deprecated
-    def push(self):
+    def push(self):  # pragma: no cover
         self._stack.push(self)
 
     @deprecated
-    def __enter__(self):
+    def __enter__(self):  # pragma: no cover
         self._ctx_id = len(self._stack)
         self._stack.push(self)
         return self
 
     @deprecated
-    def __exit__(self, exc_type, exc_value, tb):
+    def __exit__(self, exc_type, exc_value, tb):  # pragma: no cover
         self._stack.pop(self._ctx_id)
 
     @classmethod
     @deprecated
-    def current(cls):
+    def current(cls):  # pragma: no cover
         return cls._stack[-1]
 
 
