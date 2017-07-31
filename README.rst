@@ -1,6 +1,8 @@
 itunes-iap v2
 ~~~~~~~~~~~~~
 
+Python 2 & 3 compatible! Even with :mod:`asyncio` support!
+
 .. image:: https://travis-ci.org/youknowone/itunes-iap.svg?branch=master
     :target: https://travis-ci.org/youknowone/itunes-iap
 .. image:: https://coveralls.io/repos/github/youknowone/itunes-iap/badge.svg?branch=master
@@ -11,8 +13,8 @@ itunes-iap v2
 - Distribution: `<https://pypi.python.org/pypi/itunes-iap/>`_
 
 
-The quick example
------------------
+Quickstart
+----------
 
 Create request to create a request to itunes verifying api.
 
@@ -25,12 +27,26 @@ Create request to create a request to itunes verifying api.
    >>>     print('invalid receipt')
    >>> print response.receipt.last_in_app.product_id  # other values are also available as property!
 
-Practically useful attributes are:
-    `product_id`, `original_transaction_id`, `quantity` and `unique_identifier`.
+The common attributes are:
+    `product_id`, `original_transaction_id` and `quantity`.
 
 See the full document in:
     - :func:`itunesiap.verify`: The verifying function.
-    - :class:`itunesiap.receipt.InApp`: The receipt object.
+    - :class:`itunesiap.receipt.Receipt`: The receipt object.
+
+
+asyncio
+-------
+
+.. sourcecode:: python
+
+   >>> import itunesiap
+   >>> response = await itunesiap.aioverify(raw_data)  # verify -> aioverify
+
+The other parts are the same.
+
+See the full document in:
+    - :func:`itunesiap.aioverify`: The verifying function.
 
 
 Installation

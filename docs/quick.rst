@@ -1,5 +1,5 @@
-The quick guide
-===============
+Quickstart
+==========
 
 Create request to create a request to itunes verify api.
 
@@ -16,12 +16,23 @@ Create request to create a request to itunes verify api.
 Practically useful attributes are: `product_id`, `original_transaction_id`, `quantity` and `unique_identifier`.
 See the full document in :class:`itunesiap.receipt.InApp`.
 
+For :mod:`asyncio`, replace :func:`itunesiap.verify` funciton to
+:func:`itunesiap.aioverify`. That's all.
+
+.. sourcecode:: python
+
+    >>> response = itunesiap.aioverify(raw_data)
+
+
 itunesiap.verify()
 ------------------
 Note that most of the use cases are covered by the :func:`itunesiap.verify`
 function.
 
 .. autofunction:: itunesiap.verify
+
+.. autofunction:: itunesiap.aioverify
+
 
 Apple in-review mode
 --------------------

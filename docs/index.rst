@@ -3,8 +3,11 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-iTunes In-App purchase verification in Python
-=============================================
+iTunes In-App Purchase
+======================
+
+*itunes-iap* is an easy way to verify iTunes In-App Purchase receipts.
+It also is a powerful and flexible interface for them too.
 
 .. toctree::
    :maxdepth: 2

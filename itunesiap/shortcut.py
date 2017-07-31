@@ -54,6 +54,10 @@ def verify(
 
 def aioverify(
         receipt_data, password=None, exclude_old_transactions=False, **kwargs):
+    """Shortcut API for :class:`itunesiap.request.Request`.
+
+    For params and returns, see :func:`itunesiap.verify`.
+    """
     proxy_url = kwargs.pop('proxy_url', None)
     request = Request(
         receipt_data, password, exclude_old_transactions, proxy_url=proxy_url)
