@@ -56,7 +56,7 @@ PyPI is the recommended way.
 
 .. sourcecode:: shell
 
-    $ pip install itunesiap
+    $ pip install itunes-iap
 
 To browse versions and tarballs, visit:
     `<https://pypi.python.org/pypi/itunes-iap/>`_
