@@ -130,7 +130,7 @@ class ObjectMapper(object):
                 def _get(_self):
                     try:
                         value = _self._[name]
-                    except:
+                    except KeyError:
                         raise MissingFieldError(name)
                     return value
                 setattr(self.__class__, name, property(_get))
@@ -314,7 +314,7 @@ class Purchase(ObjectMapper):
             return _to_datetime(self['expires_date_formatted'])
         try:
             value = self['expires_date']
-        except:
+        except KeyError:
             raise MissingFieldError('expires_date')
         return _to_datetime(value)
 

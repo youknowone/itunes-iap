@@ -1,9 +1,8 @@
 language: python
+cache: pip
 sudo: false
 python:
-  - "2.6"
   - "2.7"
-  - "3.3"
   - "3.4"
   - "3.5"
   - "3.6"
@@ -23,5 +22,4 @@ after_success:
   - bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
 matrix:
   allow_failures:
-    - python: "2.6"
     - python: "nightly"
