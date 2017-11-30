@@ -106,6 +106,12 @@ def test_invalid_receipt():
     with pytest.raises(itunesiap.exc.InvalidReceipt):
         request.verify(env=itunesiap.env.sandbox)
 
+    try:
+        itunesiap.verify('bad data')
+    except itunesiap.exc.InvalidReceipt as e:
+        print(e)  # __str__ test
+        print(repr(e))  # __repr__ test
+
 
 def test_timeout():
     with pytest.raises(itunesiap.exceptions.ItunesServerNotReachable):

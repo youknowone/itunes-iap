@@ -30,6 +30,7 @@ class InvalidReceipt(RequestError, Response):
 
     def __init__(self, response_data):
         Response.__init__(self, response_data)
+        RequestError.__init__(self, response_data)
 
     @property
     def description(self):
