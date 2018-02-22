@@ -26,18 +26,13 @@ tests_require = [
     'pytest>=3.0.0', 'pytest-cov', 'tox', 'mock', 'patch',
 ]
 
-if sys.version_info[:2] >= (3, 4):
+if sys.version_info[:2] >= (3, 5):
     install_requires.extend([
-        'aiohttp>=2.3.2,<3.0', 'aiodns>=1.1.1',
+        'aiohttp>=3.0.1', 'aiodns>=1.1.1',
     ])
-    if sys.version_info[:2] == (3, 4):
-        tests_require.extend([
-            'pytest-asyncio==0.5.0'
-        ])
-    else:
-        tests_require.extend([
-            'pytest-asyncio'
-        ])
+    tests_require.extend([
+        'pytest-asyncio'
+    ])
 
 setup(
     name='itunes-iap',
@@ -67,7 +62,6 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',

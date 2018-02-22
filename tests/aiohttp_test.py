@@ -1,7 +1,7 @@
 import sys
 
-if sys.version_info[:2] >= (3, 4):
-    from .aiohttp_test_py34 import *  # noqa
+if sys.version_info[:2] >= (3, 5):
+    from .aiohttp_test_py35 import *  # noqa
 else:
     import pytest
 

@@ -56,6 +56,8 @@ def aioverify(
         receipt_data, password=None, exclude_old_transactions=False, **kwargs):
     """Shortcut API for :class:`itunesiap.request.Request`.
 
+    Note that python3.4 support is only available at itunesiap==2.5.1
+
     For params and returns, see :func:`itunesiap.verify`.
     """
     proxy_url = kwargs.pop('proxy_url', None)

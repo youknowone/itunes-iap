@@ -9,27 +9,27 @@ from .environment import default as default_env
 
 class AiohttpVerify:
 
-    @asyncio.coroutine
-    def aioverify_from(self, url, timeout):
+    async def aioverify_from(self, url, timeout):
         body = json.dumps(self.request_content).encode()
-        with aiohttp.ClientSession() as session:
+        async with aiohttp.ClientSession() as session:
             try:
-                http_response = yield from session.post(url, data=body, timeout=timeout)
+                http_response = await session.post(url, data=body, timeout=timeout)
             except asyncio.TimeoutError as e:
                 raise exceptions.ItunesServerNotReachable(exc=e)
             if http_response.status != 200:
-                response_text = yield from http_response.text()
+                response_text = await http_response.text()
                 raise exceptions.ItunesServerNotAvailable(http_response.status, response_text)
-            response_body = yield from http_response.text()
+            response_body = await http_response.text()
             response_data = json.loads(response_body)
             response = receipt.Response(response_data)
             if response.status != 0:
                 raise exceptions.InvalidReceipt(response_data)
             return response
 
-    @asyncio.coroutine
-    def aioverify(self, **options):
+    async def aioverify(self, **options):
         """Try to verify the given receipt with current environment.
+
+        Note that python3.4 support is only available at itunesiap==2.5.1
 
         See also:
             - Receipt_Validation_Programming_Guide_.
@@ -60,13 +60,13 @@ class AiohttpVerify:
         response = None
         if use_production:
             try:
-                response = yield from self.aioverify_from(self.PRODUCTION_VALIDATION_URL, timeout=timeout)
+                response = await self.aioverify_from(self.PRODUCTION_VALIDATION_URL, timeout=timeout)
             except exceptions.InvalidReceipt as e:
                 if not use_sandbox or e.status != self.STATUS_SANDBOX_RECEIPT_ERROR:
                     raise
         if not response and use_sandbox:
             try:
-                response = yield from self.aioverify_from(self.SANDBOX_VALIDATION_URL, timeout=timeout)
+                response = await self.aioverify_from(self.SANDBOX_VALIDATION_URL, timeout=timeout)
             except exceptions.InvalidReceipt as e:
                 raise
         return response
