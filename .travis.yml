@@ -2,11 +2,12 @@ language: python
 cache: pip
 sudo: false
 python:
+  - "pypy2.7-5.9.0"
+  - "pypy3.5-5.9.0"
   - "2.7"
+  - "3.6"
   - "3.4"
   - "3.5"
-  - "3.6"
-  - "pypy-5.4.1"
   - "nightly"
 # command to install dependencies
 install:
