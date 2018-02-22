@@ -18,8 +18,9 @@ def get_readme():
 
 
 install_requires = [
-    'requests[security]', 'prettyexc>=0.6.0',
-    'six', 'pytz', 'python-dateutil',
+    'requests[security]>=2.18.4', 'prettyexc>=0.6.0',
+    'six>=1.10.0', 'python-dateutil>=2.6.1',
+    'pytz',
 ]
 tests_require = [
     'pytest>=3.0.0', 'pytest-cov', 'tox', 'mock', 'patch',
@@ -27,11 +28,16 @@ tests_require = [
 
 if sys.version_info[:2] >= (3, 4):
     install_requires.extend([
-        'aiohttp', 'aiodns',
+        'aiohttp>=2.3.2,<3.0', 'aiodns>=1.1.1',
     ])
-    tests_require.extend([
-        'pytest-asyncio==0.5.0'
-    ])
+    if sys.version_info[:2] == (3, 4):
+        tests_require.extend([
+            'pytest-asyncio==0.5.0'
+        ])
+    else:
+        tests_require.extend([
+            'pytest-asyncio'
+        ])
 
 setup(
     name='itunes-iap',
