@@ -11,32 +11,32 @@ def verify(
 
     .. _Receipt_Validation_Programming_Guide: https://developer.apple.com/library/content/releasenotes/General/ValidateAppStoreReceipt/Chapters/ValidateRemotely.html
 
-    :param str receipt_data: :class:`itunesiap.request.Request` variable.
+    :param str receipt_data: :class:`itunesiap.request.Request` argument.
         An iTunes receipt data as Base64 encoded string.
-    :param str password: :class:`itunesiap.request.Request` variable. Optional.
+    :param str password: :class:`itunesiap.request.Request` argument. Optional.
         Only used for receipts that contain auto-renewable subscriptions. Your
         app's shared secret (a hexadecimal string).
     :param bool exclude_old_transactions: :class:`itunesiap.request.Request`
-        variable. Optional. Only used for iOS7 style app receipts that contain
+        argument. Optional. Only used for iOS7 style app receipts that contain
         auto-renewable or non-renewing subscriptions. If value is true,
         response includes only the latest renewal transaction for any
         subscriptions.
 
     :param itunesiap.environment.Environment env: Set base environment value.
         See :mod:`itunesiap.environment` for detail.
-    :param float timeout: :func:`itunesiap.request.Request.verify` variable.
+    :param float timeout: :func:`itunesiap.request.Request.verify` argument.
         Keyword-only optional. The value is connection timeout of the verifying
         request. The default value is 30.0 when no `env` is given.
     :param bool use_production: :func:`itunesiap.request.Request.verify`
-        variable. Keyword-only optional. The value is weather verifying in
+        argument. Keyword-only optional. The value is weather verifying in
         production server or not. The default value is :class:`bool` True
         when no `env` is given.
     :param bool use_sandbox: :func:`itunesiap.request.Request.verify`
-        variable. Keyword-only optional. The value is weather verifying in
+        argument. Keyword-only optional. The value is weather verifying in
         sandbox server or not. The default value is :class:`bool` False
         when no `env` is given.
 
-    :param bool verify_ssl: :func:`itunesiap.request.Request.verify` variable.
+    :param bool verify_ssl: :func:`itunesiap.request.Request.verify` argument.
         Keyword-only optional. The value is weather enabling SSL verification
         or not. WARNING: DO NOT TURN IT OFF WITHOUT A PROPER REASON. IF YOU
         DON'T UNDERSTAND WHAT IT MEANS, NEVER SET IT YOURSELF.
