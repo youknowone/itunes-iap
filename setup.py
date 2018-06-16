@@ -26,7 +26,7 @@ tests_require = [
     'pytest>=3.0.0', 'pytest-cov', 'tox', 'mock', 'patch',
 ]
 
-if sys.version_info[:2] >= (3, 5):
+if sys.version_info[:3] >= (3, 5, 3):
     install_requires.extend([
         'aiohttp>=3.0.1', 'aiodns>=1.1.1',
     ])
