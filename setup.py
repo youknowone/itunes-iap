@@ -5,8 +5,13 @@ from setuptools import setup
 
 
 def get_version():
-    with open('itunesiap/version.txt') as f:
-        return f.read().strip()
+    with open('itunesiap/__version__.py') as f:
+        s = f.readline().strip()
+    _, v = s.split('__version__ = ')
+    version = v.strip("'")
+    assert version.startswith('2.')
+    assert version[-1] in '0123456789'
+    return version
 
 
 def get_readme():
@@ -47,7 +52,7 @@ setup(
         'itunesiap',
     ),
     package_data={
-        'itunesiap': ['version.txt']
+        'itunesiap': []
     },
     install_requires=install_requires,
     tests_require=tests_require,
