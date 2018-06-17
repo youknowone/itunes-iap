@@ -1,4 +1,4 @@
-
+# coding: utf-8
 import json
 import itunesiap
 import pytest
@@ -128,9 +128,9 @@ def itunes_autorenew_response1():
 
 
 @pytest.fixture(scope='session')
-def itunes_autorenew_response():
+def itunes_autorenew_response2():
     """Contributed by Jonas Petersen @jox"""
-    return json.loads('''{
+    return json.loads(r'''{
       "status": 0,
       "environment": "Sandbox",
       "receipt": {
@@ -694,3 +694,65 @@ def itunes_autorenew_response():
         }
       ]
     }''')
+
+
+@pytest.fixture(scope='session')
+def itunes_autorenew_response3():
+    """Contributed by François Dupayrat @FrancoisDupayrat"""
+    return json.loads(r'''{
+      "auto_renew_status": 1,
+      "status": 0,
+      "auto_renew_product_id": "******************************",
+      "receipt":{
+        "original_purchase_date_pst":"2017-06-28 07:31:51 America/Los_Angeles",
+        "unique_identifier":"******************************",
+        "original_transaction_id":"******************************",
+        "expires_date":"1506524970000",
+        "transaction_id":"******************************",
+        "quantity":"1",
+        "product_id":"******************************",
+        "item_id":"******************************",
+        "bid":"******************************",
+        "unique_vendor_identifier":"******************************",
+        "web_order_line_item_id":"******************************",
+        "bvrs":"1.1.6",
+        "expires_date_formatted":"2017-09-27 15:09:30 Etc/GMT",
+        "purchase_date":"2017-09-27 15:04:30 Etc/GMT",
+        "purchase_date_ms":"1506524670000",
+        "expires_date_formatted_pst":"2017-09-27 08:09:30 America/Los_Angeles",
+        "purchase_date_pst":"2017-09-27 08:04:30 America/Los_Angeles",
+        "original_purchase_date":"2017-06-28 14:31:51 Etc/GMT",
+        "original_purchase_date_ms":"1498660311000"
+      },
+      "latest_receipt_info":{
+        "original_purchase_date_pst":"2017-06-28 07:31:51 America/Los_Angeles",
+        "unique_identifier":"******************************",
+        "original_transaction_id":"******************************",
+        "expires_date":"******************************",
+        "transaction_id":"******************************",
+        "quantity":"1",
+        "product_id":"******************************",
+        "item_id":"******************************",
+        "bid":"******************************",
+        "unique_vendor_identifier":"******************************",
+        "web_order_line_item_id":"******************************",
+        "bvrs":"1.1.6",
+        "expires_date_formatted":"2017-09-27 15:09:30 Etc/GMT",
+        "purchase_date":"2017-09-27 15:04:30 Etc/GMT",
+        "purchase_date_ms":"1506524670000",
+        "expires_date_formatted_pst":"2017-09-27 08:09:30 America/Los_Angeles",
+        "purchase_date_pst":"2017-09-27 08:04:30 America/Los_Angeles",
+        "original_purchase_date":"2017-06-28 14:31:51 Etc/GMT",
+        "original_purchase_date_ms":"1498660311000"
+      },
+      "latest_receipt":"******************************"
+    }''')
+
+
+@pytest.fixture(params=[
+    pytest.lazy_fixture('itunes_autorenew_response1'),
+    pytest.lazy_fixture('itunes_autorenew_response2'),
+    pytest.lazy_fixture('itunes_autorenew_response3'),
+])
+def itunes_autorenew_response(request):
+    return request.param

@@ -23,7 +23,8 @@ install_requires = [
     'pytz',
 ]
 tests_require = [
-    'pytest>=3.0.0', 'pytest-cov', 'tox', 'mock', 'patch',
+    'pytest>=3.0.0', 'pytest-cov', 'pytest-lazy-fixture', 'tox',
+    'mock', 'patch',
 ]
 
 if sys.version_info[:2] >= (3, 5):
