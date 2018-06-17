@@ -3,9 +3,10 @@
 A successful response returns a JSON object including receipts. To manipulate
 them in convinient way, `itunes-iap` wrapped it with :class:`ObjectMapper`.
 """
+import datetime
+import warnings
 import pytz
 import dateutil.parser
-import warnings
 import json
 from collections import defaultdict
 from prettyexc import PrettyException
@@ -21,12 +22,21 @@ WARN_UNLISTED_FIELDS = True
 _warned_undocumented_fields = defaultdict(bool)
 _warned_unlisted_field = defaultdict(bool)
 
+'''
+class ExpirationIntent(Enum):
+    CustomerCanceledTheirSubscription = 1
+    BillingError = 2
+    CustumerDidNotAgreeToARecentPriceIncrease = 3
+    ProductWasNotAvailableForPurchaseAtTheTimeOfRenewal = 4
+    UnknownError = 5
+'''
+
 
 class MissingFieldError(PrettyException, AttributeError, KeyError):
     """A Backward compatibility error."""
 
 
-def _to_datetime(value):
+def _rfc3339_to_datetime(value):
     """Try to parse Apple iTunes receipt date format.
 
     By reference, they insists it is rfc3339:
@@ -48,6 +58,12 @@ def _to_datetime(value):
             raise e
         d = d.replace(tzinfo=pytz.timezone(timezone))
     return d
+
+
+def _ms_to_datetime(value):
+    nd = datetime.datetime.utcfromtimestamp(int(value) / 1000)
+    ad = nd.replace(tzinfo=pytz.UTC)
+    return ad
 
 
 def _to_bool(data):
@@ -135,13 +151,19 @@ class ObjectMapper(object):
                     return value
                 setattr(self.__class__, name, property(_get))
             elif name in self.__FIELD_ADAPTERS__:
+                adapter = self.__FIELD_ADAPTERS__[name]
+                if isinstance(adapter, tuple):
+                    data_key, transform = adapter
+                else:
+                    data_key = name
+                    transform = adapter
+
                 def _get(_self):
-                    field_filter = self.__FIELD_ADAPTERS__[name]
                     try:
-                        value = _self._[name]
+                        value = _self._[data_key]
                     except KeyError:
                         raise MissingFieldError(name)
-                    return field_filter(value)
+                    return transform(value)
                 setattr(self.__class__, name, lazy_property(_get))
             else:
                 pass  # unhandled. raise AttributeError
@@ -184,43 +206,86 @@ class Receipt(ObjectMapper):
     This object encapsulate it to list of :class:`InApp` object in `in_app`
     property.
 
-    See also: `<https://developer.apple.com/library/content/releasenotes/General/ValidateAppStoreReceipt/Chapters/ReceiptFields.html>`_
+    :see: `<https://developer.apple.com/library/content/releasenotes/General/ValidateAppStoreReceipt/Chapters/ReceiptFields.html>`_
     """
     __OPAQUE_FIELDS__ = frozenset([
+        # app receipt fields
         'bundle_id',
         'application_version',
         'original_application_version',
+        # in-app purchase receipt fields
+        'product_id',
+        'transaction_id',
+        'original_transaction_id',
+        'expires_date_formatted',
         'app_item_id',
         'version_external_identifier',
+        'web_order_line_item_id',
+        'auto_renew_product_id',
     ])
     __FIELD_ADAPTERS__ = {
-        'receipt_creation_date': _to_datetime,
+        # app receipt fields
+        'receipt_creation_date': _rfc3339_to_datetime,
         'receipt_creation_date_ms': int,
-        'receipt_expiration_date': _to_datetime,
-        'receipt_expiration_date_ms': int,
-        'original_purchase_date': _to_datetime,
+        'expiration_date': _rfc3339_to_datetime,
+        'expiration_date_ms': int,
+        # in-app purchase receipt fields
+        'quantity': int,
+        'purchase_date': _rfc3339_to_datetime,
+        'purchase_date_ms': int,
+        'original_purchase_date': _rfc3339_to_datetime,
         'original_purchase_date_ms': int,
-        'request_date': _to_datetime,
+        'expires_date': _ms_to_datetime,
+        'expires_date_ms': ('expires_date', int),
+        'expiration_intent': int,
+        'is_in_billing_retry_period': _to_bool,
+        'is_in_intro_offer_period': _to_bool,
+        'cancellation_date': _rfc3339_to_datetime,
+        'cancellation_reason': int,
+        'auto_renew_status': int,
+        'price_consent_status': int,
+        'request_date': _rfc3339_to_datetime,
         'request_date_ms': int,
     }
     __DOCUMENTED_FIELDS__ = frozenset([
+        # app receipt fields
         'bundle_id',
         'in_app',
         'application_version',
         'original_application_version',
         'receipt_creation_date',
-        'receipt_creation_date_ms',
-        'receipt_expiration_date',
-        'receipt_expiration_date_ms',
+        'expiration_date',
+        # in-app purchase receipt fields
+        'quantity',
+        'product_id',
+        'transaction_id',
+        'original_transaction_id',
+        'purchase_date',  # _formatted value
+        'original_purchase_date',
+        'expires_date',  # _ms value
+        'is_in_billing_retry_period',
+        'is_in_intro_offer_period',
+        'cancellation_date',
+        'cancellation_reason',
         'app_item_id',
         'version_external_identifier',
+        'web_order_line_item_id',
+        'auto_renew_status',
+        'auto_renew_product_id',
+        'price_consent_status',
     ])
     __UNDOCUMENTED_FIELDS__ = frozenset([
+        # app receipt fields
         'request_date',
         'request_date_ms',
         'version_external_identifier',
-        'original_purchase_date',
+        'receipt_creation_date_ms',
+        'expiration_date_ms',
+        # in-app purchase receipt fields
+        'purchase_date_ms',
         'original_purchase_date_ms',
+        'expires_date_formatted',
+        'unique_identifier',
     ])
 
     @lazy_property
@@ -266,18 +331,18 @@ class Purchase(ObjectMapper):
         'original_transaction_id',
         'web_order_line_item_id',
         'unique_identifier',
+        'expires_date_formatted',
     ])
     __FIELD_ADAPTERS__ = {
         'quantity': int,
-        'purchase_date': _to_datetime,
+        'purchase_date': _rfc3339_to_datetime,
         'purchase_date_ms': int,
-        'original_purchase_date': _to_datetime,
+        'original_purchase_date': _rfc3339_to_datetime,
         'original_purchase_date_ms': int,
-        'expires_date': _to_datetime,
-        'expires_date_formatted': _to_datetime,
+        'expires_date': _rfc3339_to_datetime,
         'expires_date_ms': int,
         'is_trial_period': _to_bool,
-        'cancellation_date': _to_datetime,
+        'cancellation_date': _rfc3339_to_datetime,
         'cancellation_date_ms': int,
         'cancellation_reason': int,
     }
@@ -287,19 +352,18 @@ class Purchase(ObjectMapper):
         'transaction_id',
         'original_transaction_id',
         'purchase_date',
-        'purchase_date_ms',  # de facto documented
         'original_purchase_date',
-        'original_purchase_date_ms',  # de facto documented
         'expires_date',
-        'expires_date_ms',  # de facto documented
         'is_trial_period',
         'cancellation_date',
-        'cancellation_date_ms',  # de facto documented
         'cancellation_reason',
         'web_order_line_item_id',
     ])
     __UNDOCUMENTED_FIELDS__ = frozenset([
         'unique_identifier',
+        'purchase_date_ms',
+        'original_purchase_date_ms',
+        'cancellation_date_ms',
         'expires_date_formatted',  # legacy receipts has this field as actual "expires_date"
     ])
 
@@ -311,12 +375,17 @@ class Purchase(ObjectMapper):
     @lazy_property
     def expires_date(self):
         if 'expires_date_formatted' in self:
-            return _to_datetime(self['expires_date_formatted'])
+            return _rfc3339_to_datetime(self['expires_date_formatted'])
         try:
             value = self['expires_date']
         except KeyError:
             raise MissingFieldError('expires_date')
-        return _to_datetime(value)
+        try:
+            int(value)
+        except ValueError:
+            return _rfc3339_to_datetime(value)
+        else:
+            return _ms_to_datetime(value)
 
 
 class InApp(Purchase):

@@ -7,33 +7,57 @@ import six
 import pytest
 
 
-to_datetime = itunesiap.receipt._to_datetime
+rfc3339_to_datetime = itunesiap.receipt._rfc3339_to_datetime
+ms_to_datetime = itunesiap.receipt._ms_to_datetime
 
 
-def test_receipt_date():
+def test_to_datetime():
+    d1 = rfc3339_to_datetime(u'1970-01-01 00:00:00 Etc/GMT')
+    d2 = ms_to_datetime(0)
+    assert d1 == d2
+
+    d1 = rfc3339_to_datetime(u'2017-09-27 15:04:30 Etc/GMT')
+    d2 = ms_to_datetime(1506524670000)
+    assert d1 == d2
+
+
+def test_rfc3339_to_datetime():
     """Test to parse string dates to python dates"""
-    import pytz
-    import datetime
-
-    d = to_datetime(u'2013-01-01T00:00:00+09:00')
+    d = rfc3339_to_datetime(u'2013-01-01T00:00:00+09:00')
     assert (d.year, d.month, d.day) == (2013, 1, 1)
     assert d.tzinfo._offset == datetime.timedelta(0, 9 * 3600)
 
-    d = to_datetime(u'2013-01-01 00:00:00 Etc/GMT')
+    d = rfc3339_to_datetime(u'2013-01-01 00:00:00 Etc/GMT')
     assert (d.year, d.month, d.day) == (2013, 1, 1)
     assert d.tzinfo._utcoffset == datetime.timedelta(0)
 
-    d = to_datetime(u'2013-01-01 00:00:00 America/Los_Angeles')
+    d = rfc3339_to_datetime(u'2013-01-01 00:00:00 America/Los_Angeles')
     assert (d.year, d.month, d.day) == (2013, 1, 1)
     assert d.tzinfo == pytz.timezone('America/Los_Angeles')
 
     with pytest.raises(ValueError):
-        assert to_datetime(u'wrong date')
+        assert rfc3339_to_datetime(u'wrong date')
 
 
-def test_autorenew_latest(itunes_autorenew_response):
+def test_autorenew_general(itunes_autorenew_response):
     response = itunesiap.Response(itunes_autorenew_response)
     assert response.status == 0
+    assert response.receipt  # definitely, no common sense through versions
+
+
+def test_autorenew_latest(itunes_autorenew_response3):
+    response = itunesiap.Response(itunes_autorenew_response3)
+    assert response.status == 0
+    receipt = response.receipt
+    assert receipt.quantity == 1
+    assert isinstance(receipt.purchase_date, datetime.datetime)
+    assert isinstance(receipt.original_purchase_date, datetime.datetime)
+    assert receipt.expires_date.date() == datetime.date(2017, 9, 27)
+    assert receipt.expires_date_ms == 1506524970000
+
+
+def test_autorenew_middleage(itunes_autorenew_response2):
+    response = itunesiap.Response(itunes_autorenew_response2)
     assert isinstance(response.latest_receipt, six.string_types)
 
     receipt = response.receipt
@@ -98,9 +122,9 @@ def test_autorenew_legacy(itunes_autorenew_response_legacy):
     assert response.receipt.single_purchase == response.latest_receipt_info
     purchase = response.receipt.single_purchase
     with pytest.raises((OverflowError, ValueError)):
-        to_datetime(purchase._expires_date)
+        rfc3339_to_datetime(purchase._expires_date)
     assert purchase.expires_date.date() == datetime.date(2012, 12, 2)
-    assert purchase.expires_date == to_datetime(purchase._expires_date_formatted)
+    assert purchase.expires_date == rfc3339_to_datetime(purchase._expires_date_formatted)
 
     assert isinstance(purchase.original_purchase_date, datetime.datetime)
     assert isinstance(purchase.transaction_id, six.string_types)
