@@ -151,13 +151,19 @@ class ObjectMapper(object):
                     return value
                 setattr(self.__class__, name, property(_get))
             elif name in self.__FIELD_ADAPTERS__:
+                adapter = self.__FIELD_ADAPTERS__[name]
+                if isinstance(adapter, tuple):
+                    data_key, transform = adapter
+                else:
+                    data_key = name
+                    transform = adapter
+
                 def _get(_self):
-                    field_filter = self.__FIELD_ADAPTERS__[name]
                     try:
-                        value = _self._[name]
+                        value = _self._[data_key]
                     except KeyError:
                         raise MissingFieldError(name)
-                    return field_filter(value)
+                    return transform(value)
                 setattr(self.__class__, name, lazy_property(_get))
             else:
                 pass  # unhandled. raise AttributeError
@@ -230,6 +236,7 @@ class Receipt(ObjectMapper):
         'original_purchase_date': _rfc3339_to_datetime,
         'original_purchase_date_ms': int,
         'expires_date': _ms_to_datetime,
+        'expires_date_ms': ('expires_date', int),
         'expiration_intent': int,
         'is_in_billing_retry_period': _to_bool,
         'is_in_intro_offer_period': _to_bool,
@@ -301,10 +308,6 @@ class Receipt(ObjectMapper):
         """The last item in `in_app` property order by purchase_date."""
         return sorted(
             self.in_app, key=lambda x: x['original_purchase_date_ms'])[-1]
-
-    @property
-    def expires_date_ms(self):
-        return self._['expires_date']
 
 
 class Purchase(ObjectMapper):

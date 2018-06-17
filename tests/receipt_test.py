@@ -53,6 +53,7 @@ def test_autorenew_latest(itunes_autorenew_response3):
     assert isinstance(receipt.purchase_date, datetime.datetime)
     assert isinstance(receipt.original_purchase_date, datetime.datetime)
     assert receipt.expires_date.date() == datetime.date(2017, 9, 27)
+    assert receipt.expires_date_ms == 1506524970000
 
 
 def test_autorenew_middleage(itunes_autorenew_response2):
