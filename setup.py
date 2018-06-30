@@ -23,8 +23,10 @@ def get_readme():
 
 
 install_requires = [
-    'requests[security]>=2.18.4', 'prettyexc>=0.6.0',
-    'six>=1.10.0', 'python-dateutil>=2.6.1',
+    'requests>=2.18.4', 'requests[security]>=2.18.4;python_version<"3.6"',
+    'prettyexc>=0.6.0',
+    'six>=1.10.0',
+    'python-dateutil>=2.6.1',
     'pytz',
 ]
 tests_require = [
