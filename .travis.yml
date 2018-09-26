@@ -12,14 +12,13 @@ python:
 # command to install dependencies
 install:
   - "pip install --upgrade pip"
-  - "pip install flake8 python-coveralls sphinx '.[tests]'"
+  - "pip install flake8 sphinx '.[tests]'"
 # command to run tests
 script:
   - "flake8 --ignore=E501,E999 ."
   - "pytest --cov=itunesiap -vv tests/"
   - "python -msphinx -M html docs build"
 after_success:
-  - "coveralls"
   - bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
 matrix:
   allow_failures:
