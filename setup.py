@@ -30,7 +30,7 @@ install_requires = [
     'pytz',
 ]
 tests_require = [
-    'pytest>=3.0.0', 'pytest-cov', 'pytest-lazy-fixture', 'tox',
+    'pytest>=3.0.0', 'pytest-cov', 'pytest-lazy-fixture==0.4.1', 'tox',
     'mock', 'patch',
 ]
 
