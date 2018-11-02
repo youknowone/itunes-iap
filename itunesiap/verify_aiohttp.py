@@ -67,6 +67,6 @@ class AiohttpVerify:
         if not response and use_sandbox:
             try:
                 response = await self.aioverify_from(self.SANDBOX_VALIDATION_URL, timeout=timeout)
-            except exceptions.InvalidReceipt as e:
+            except exceptions.InvalidReceipt:
                 raise
         return response
