@@ -30,13 +30,14 @@ install_requires = [
     'pytz',
 ]
 tests_require = [
-    'pytest>=3.0.0', 'pytest-cov', 'pytest-lazy-fixture==0.4.1', 'tox',
+    'pytest>=4.3.0', 'pytest-cov>=2.6.1', 'pytest-lazy-fixture==0.5.1', 'tox',
     'mock', 'patch',
+    'attrs==18.2.0',  # pytest requirements,
 ]
 
 if sys.version_info[:3] >= (3, 5, 3):
     install_requires.extend([
-        'aiohttp>=3.0.1', 'aiodns>=1.1.1',
+        'aiohttp>=3.0.9', 'aiodns>=1.1.1',
     ])
     tests_require.extend([
         'pytest-asyncio'
@@ -73,5 +74,6 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
     ],
 )
