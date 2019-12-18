@@ -2,18 +2,20 @@ language: python
 cache: pip
 sudo: false
 python:
-  - "pypy2.7-5.10.0"
-  - "pypy3.5-5.10.1"
+  - "pypy2.7-7.1.1"
+  - "pypy3.6-7.1.1"
   - "2.7"
+  - "3.8"
+  - "3.7"
   - "3.6"
-  - "3.4"
   - "3.5"
+  - "3.4"
   - "nightly"
 # command to install dependencies
 install:
   - "pip install --upgrade pip"
-  - "pip install flake8 sphinx '.[tests]'"
-# command to run tests
+  - "pip install flake8 sphinx '.[test]'"
+# command to run test
 script:
   - "flake8 --ignore=E501,E999 ."
   - "pytest --cov=itunesiap -vv tests/"
