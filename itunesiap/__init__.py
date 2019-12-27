@@ -8,7 +8,6 @@ Itunes In-app Purchase verification api.
 :license: 2-clause BSD.
 """
 
-from .__version__ import __version__
 from .request import Request
 from .receipt import Response, Receipt, InApp
 from .shortcut import verify, aioverify
@@ -20,6 +19,7 @@ exc = exceptions
 env = environment  # env.default, env.sandbox, env.review
 
 
+__version__ = '2.6.0'
 __all__ = (
     '__version__', 'Request', 'Response', 'Receipt', 'InApp',
     'verify', 'aioverify',
